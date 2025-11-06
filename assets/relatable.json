@@ -1,0 +1,7 @@
+[
+  { "id": 1, "label": "driving a gas car for 1 mile", "co2PerUnit": 404 },
+  { "id": 2, "label": "charging a smartphone 50×",    "co2PerUnit": 36 },
+  { "id": 3, "label": "watching TV for 5 hours",      "co2PerUnit": 94 },
+  { "id": 4, "label": "eating one cheeseburger",      "co2PerUnit": 3000 },
+  { "id": 5, "label": "running a 60W bulb for 24h",   "co2PerUnit": 34 }
+]

@@ -1,0 +1,39 @@
+{
+  "expo": {
+    "name": "canopyx",
+    "slug": "snack-86772f5d-93e6-4d75-b1e3-8fd07eb434ca",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": false,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.nikeeel.snack86772f5d93e64d75b1e38fd07eb434ca",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true,
+      "package": "com.nikeeel.snack86772f5d93e64d75b1e38fd07eb434ca"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "65374299-5bde-4319-8aa4-a728b059c294"
+      }
+    }
+  }
+}
