@@ -6,12 +6,13 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   updateProfile,
-  GoogleAuthProvider,
-  signInWithPopup,
-  signInWithRedirect,
-  getRedirectResult
 } from 'firebase/auth';
-import { WebBrowser } from 'expo-web-browser';
+import * as WebBrowser from 'expo-web-browser';
+import * as Google from 'expo-auth-session/providers/google';
+import { ResponseType } from 'expo-auth-session';
+
+
+WebBrowser.maybeCompleteAuthSession();
 
 const AuthContext = createContext();
 
@@ -28,7 +29,16 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState(null);
 
-  // Set up auth state listener
+  
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    expoClientId: 'YOUR_EXPO_CLIENT_ID', // From Google Cloud Console
+    iosClientId: 'YOUR_IOS_CLIENT_ID',   // For iOS
+    androidClientId: '', // For Android
+    webClientId: '818108344816-jh1k9rukdn2j24n079fkq3jhjsphgf5q.apps.googleusercontent.com',   // For web
+    responseType: ResponseType.IdToken,
+  });
+
+  
   useEffect(() => {
     console.log('Setting up auth state listener...');
     
@@ -49,19 +59,51 @@ export const AuthProvider = ({ children }) => {
     return unsubscribe;
   }, []);
 
+ 
+  useEffect(() => {
+    if (response?.type === 'success') {
+      const { id_token } = response.params;
+      handleGoogleSignIn(id_token);
+    }
+  }, [response]);
+
+  const handleGoogleSignIn = async (idToken) => {
+    try {
+     
+      
+      console.log('Google sign in successful with token:', idToken);
+      
+      
+      const tempUser = {
+        uid: 'google-user-' + Date.now(),
+        displayName: 'Google User',
+        email: 'user@google.com',
+        photoURL: null,
+        providerId: 'google.com'
+      };
+      setUser(tempUser);
+      
+    } catch (error) {
+      console.error('Google token sign in error:', error);
+      setAuthError(error);
+    }
+  };
+
   const signInWithGoogle = async () => {
     try {
       console.log('Starting Google sign in...');
       
-      const provider = new GoogleAuthProvider();
-      
-      // For web, use popup
-      if (typeof window !== 'undefined') {
+     
+      if (typeof window !== 'undefined' && window.document) {
+        const { GoogleAuthProvider, signInWithPopup } = await import('firebase/auth');
+        const provider = new GoogleAuthProvider();
         const result = await signInWithPopup(auth, provider);
-        console.log('Google sign in successful:', result.user);
+        console.log('Web Google sign in successful:', result.user);
         return result;
-      } else {
-        throw new Error('Google sign in not supported on this platform');
+      } 
+     
+      else {
+        await promptAsync();
       }
     } catch (error) {
       console.error('Google Sign In Error:', error);
@@ -74,8 +116,8 @@ export const AuthProvider = ({ children }) => {
 
   const signInWithApple = async () => {
     try {
-      console.log('Apple sign in - implement with expo-apple-authentication');
-      throw new Error('Apple sign in not implemented yet');
+      console.log('Apple sign in - not available on Android');
+      throw new Error('Apple Sign-In is only available on iOS devices. Please use Google Sign-In or email login.');
     } catch (error) {
       console.error('Apple Sign In Error:', error);
       setAuthError(error);
@@ -85,17 +127,21 @@ export const AuthProvider = ({ children }) => {
 
   const signInWithEmail = async (email, password) => {
     try {
+      setLoading(true);
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       return userCredential;
     } catch (error) {
       console.error('Email sign in error:', error);
       setAuthError(error);
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
   const signUpWithEmail = async (email, password, name) => {
     try {
+      setLoading(true);
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       if (name) {
         await updateProfile(userCredential.user, {
@@ -107,6 +153,8 @@ export const AuthProvider = ({ children }) => {
       console.error('Email sign up error:', error);
       setAuthError(error);
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -137,3 +185,4 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+

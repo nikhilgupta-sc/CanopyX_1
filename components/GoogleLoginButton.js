@@ -1,22 +1,29 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import { useAuth } from '../contexts/AuthContext';
+import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 
 const GoogleLoginButton = ({ style, textStyle, loading = false, onPress }) => {
-  const { signInWithGoogle } = useAuth();
-
   const handlePress = async () => {
     try {
-      await signInWithGoogle();
-      if (onPress) onPress();
+      if (onPress) {
+        await onPress();
+      }
     } catch (error) {
       console.error('Google login failed:', error);
+      let errorMessage = 'Unable to sign in with Google. Please try again.';
+      
+      if (error.message.includes('Apple Sign-In')) {
+        errorMessage = 'Apple Sign-In is only available on iOS. Please use Google Sign-In or email login.';
+      } else if (error.code === 'auth/popup-closed-by-user') {
+        errorMessage = 'Sign in was cancelled. Please try again.';
+      }
+      
+      Alert.alert('Login Failed', errorMessage);
     }
   };
 
   return (
     <TouchableOpacity
-      style={[styles.button, style]}
+      style={[styles.button, style, loading && styles.buttonDisabled]}
       onPress={handlePress}
       disabled={loading}
     >
@@ -36,6 +43,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     marginVertical: 10,
+    minHeight: 50,
+    justifyContent: 'center',
+  },
+  buttonDisabled: {
+    backgroundColor: '#CCCCCC',
   },
   text: {
     color: 'white',
@@ -45,3 +57,4 @@ const styles = StyleSheet.create({
 });
 
 export default GoogleLoginButton;
+
