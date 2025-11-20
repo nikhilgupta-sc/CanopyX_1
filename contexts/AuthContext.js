@@ -31,9 +31,9 @@ export const AuthProvider = ({ children }) => {
 
   
   const [request, response, promptAsync] = Google.useAuthRequest({
-    expoClientId: 'YOUR_EXPO_CLIENT_ID', // From Google Cloud Console
+    expoClientId: '818108344816-63utcga7gjsigao0hkj41f0ifhuhbc2n.apps.googleusercontent.com', // From Google Cloud Console
     iosClientId: 'YOUR_IOS_CLIENT_ID',   // For iOS
-    androidClientId: '', // For Android
+    androidClientId: '818108344816-rskmmeu64fthdc23a8ehg816ei17bvgg.apps.googleusercontent.com', // For Android
     webClientId: '818108344816-jh1k9rukdn2j24n079fkq3jhjsphgf5q.apps.googleusercontent.com',   // For web
     responseType: ResponseType.IdToken,
   });
