@@ -1,36 +1,34 @@
 import React, { useState, useEffect, useCallback } from 'react';
-// Note: Inline SVG Icons are used to resolve the 'unable to resolve lucide-react' error.
-
-// --- INLINE SVG ICONS (Replaces lucide-react) ---
-const RefreshCcw = ({ size = 24, className = '' }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.76 2.76L3 8" /><path d="M3 3v5h5" /><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.76-2.76L21 16" /><path d="M21 21v-5h-5" /></svg>);
-const Leaf = ({ size = 24, className = '' }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 16 11.6 15.5 14c-.6 2.3-3.6 5.5-5.8 5.9-1.4.3-2.5-.4-2.8-1.7C5.8 17.5 7 13.5 11 20z" /><path d="M2 21c3.5-3 6-5.5 11.5-6" /></svg>);
-const Droplet = ({ size = 24, className = '' }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" /></svg>);
-const Snowflake = ({ size = 24, className = '' }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="2" x2="22" y1="12" y2="12" /><line x1="12" x2="12" y1="2" y2="22" /><path d="m20 16-8-4-8 4" /><path d="m4 8 8 4 8-4" /><path d="m16 4-4 8-4-8" /><path d="m8 20 4-8 4 8" /></svg>);
-const Sun = ({ size = 24, className = '' }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="4" /><path d="M12 2v2" /><path d="M12 20v2" /><path d="M22 12h-2" /><path d="M4 12H2" /><path d="M18.36 5.64l-1.48 1.48" /><path d="M6.07 17.93l-1.48 1.48" /><path d="M17.93 17.93l1.48 1.48" /><path d="M5.64 5.64l1.48 1.48" /></svg>);
-const Flame = ({ size = 24, className = '' }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.24.7-2.65 1.7-3.66 1.48-1.6 4.5-1.9 4.5-1.9H12s-3.5 1.5-3.5 3c0 1.25.9 2.5 2 3.5.5.5 1 1.2 1.5 2-.45.92-1.4 1.5-2.5 1.5z" /><path d="M22 21.5-14-14" /></svg>);
-const MessageSquare = ({ size = 24, className = '' }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>);
-const AlertTriangle = ({ size = 24, className = '' }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" /><line x1="12" x2="12" y1="9" y2="13" /><line x1="12" x2="12.01" y1="17" y2="17" /></svg>);
-const Zap = ({ size = 24, className = '' }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>);
-const CloudOff = ({ size = 24, className = '' }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22.61 10.21A5 5 0 0 0 18 6H9a5 5 0 0 0-3.8-1.58M3 3l18 18" /><path d="M7.5 17.16a5 5 0 0 0 6.64-6.32" /></svg>);
-const Loader2 = ({ size = 24, className = '' }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>);
-// --- END INLINE SVG ICONS ---
-
-
-const API_KEY = ""; // Managed by the environment
-const IMAGE_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=" + API_KEY;
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  ScrollView, 
+  Image, 
+  Pressable, 
+  Dimensions, 
+  ActivityIndicator, 
+  Platform 
+} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Ionicons, Feather } from '@expo/vector-icons'; 
 
 // --- CONFIGURATION ---
+// Note: Icons are mapped to Ionicons/Feather for React Native compatibility
 const PLACES = [
-  { id: 'amazon', name: 'Amazon Rainforest', Icon: Leaf, color: 'text-green-600' },
-  { id: 'gbr', name: 'Great Barrier Reef', Icon: Droplet, color: 'text-cyan-500' },
-  { id: 'arctic', name: 'Arctic Sea Ice', Icon: Snowflake, color: 'text-sky-400' },
-  { id: 'maldives', name: 'The Maldives', Icon: Sun, color: 'text-yellow-500' },
-  { id: 'yosemite', name: 'Yosemite, CA', Icon: Flame, color: 'text-orange-500' }, 
+  // Mapping inline SVGs to Ionicons or Feather
+  { id: 'amazon', name: 'Amazon Rainforest', Icon: ({ size, color }) => <Ionicons name="leaf-outline" size={size} color={color} />, color: '#16A34A' }, // green-600
+  { id: 'gbr', name: 'Great Barrier Reef', Icon: ({ size, color }) => <Ionicons name="water-outline" size={size} color={color} />, color: '#06B6D4' }, // cyan-500
+  { id: 'arctic', name: 'Arctic Sea Ice', Icon: ({ size, color }) => <Ionicons name="snow-outline" size={size} color={color} />, color: '#38BDF8' }, // sky-400
+  { id: 'maldives', name: 'The Maldives', Icon: ({ size, color }) => <Ionicons name="sunny-outline" size={size} color={color} />, color: '#F59E0B' }, // yellow-500
+  { id: 'yosemite', name: 'Yosemite, CA', Icon: ({ size, color }) => <Ionicons name="flame-outline" size={size} color={color} />, color: '#EA580C' }, // orange-500
 ];
 
 const YEARS = [5, 10, 25, 50, 100];
+const API_KEY = "AIzaSyBz3TMrqBB3g3odwi8Folb5neDiuGlalTo"; // 🛑 UPDATE THIS WITH YOUR KEY
+const IMAGE_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=" + API_KEY;
 
-// Detailed image generation prompts for all 25 scenarios (No change)
+// Detailed image generation prompts for all 25 scenarios (COPIED FROM YOUR FILE)
 const IMAGE_PROMPTS = {
   amazon: {
     5: "Cinematic, realistic photo of a fragmenting Amazon Rainforest edge. Show subtle signs of stress: slightly dry leaves, a new dirt road cutting into the dense jungle. Deep green and brown tones. Professional aesthetic.",
@@ -69,41 +67,41 @@ const IMAGE_PROMPTS = {
   },
 };
 
-// Scientific Explanations & Hotspot Data (Icon references updated to use inline SVGs)
+// Scientific Explanations & Hotspot Data (COPIED AND MAPPED ICONS FROM YOUR FILE)
 const SCENARIOS = {
   amazon: {
     5: {
       description: "In just 5 years, the Amazon begins to face increased fragmentation due to illegal logging and agricultural roads. These roads create 'edge effects,' drying out the surrounding forest, making trees vulnerable to insect infestation and small, human-caused fires. The subtle changes are often only visible to experts, but the ecosystem is already under stress.",
       bubbles: [
-        { x: 30, y: 40, title: "Canopy Thinning", text: "Trees at the newly formed edges lose moisture and shed leaves prematurely due to exposure.", Icon: CloudOff },
+        { x: 30, y: 40, title: "Canopy Thinning", text: "Trees at the newly formed edges lose moisture and shed leaves prematurely due to exposure.", Icon: ({ size, color }) => <Feather name="cloud-off" size={size} color={color} /> },
       ],
     },
     10: {
       description: "Agricultural expansion and cattle ranching have pushed deeper into the forest. The distinct 'fishbone' pattern of deforestation is now widely visible from satellite imagery as the forest is systematically cleared. This scale of loss significantly impacts the region's ability to recycle moisture, shortening the wet season.",
       bubbles: [
-        { x: 50, y: 50, title: "Road Expansion", text: "New unpaved roads open up previously inaccessible forest to human activity and degradation.", Icon: Zap },
-        { x: 75, y: 60, title: "Cattle Grazing", text: "Cleared land turns into pasture, which compacts soil and prevents forest regeneration.", Icon: RefreshCcw },
+        { x: 50, y: 50, title: "Road Expansion", text: "New unpaved roads open up previously inaccessible forest to human activity and degradation.", Icon: ({ size, color }) => <Feather name="zap" size={size} color={color} /> },
+        { x: 75, y: 60, title: "Cattle Grazing", text: "Cleared land turns into pasture, which compacts soil and prevents forest regeneration.", Icon: ({ size, color }) => <Feather name="refresh-ccw" size={size} color={color} /> },
       ],
     },
     25: {
       description: "The 'Tipping Point' is within sight. Global heating and local deforestation cause rainfall patterns to dramatically disrupt, leading to exceptionally long dry seasons. The rainforest is struggling to generate its own moisture, placing deep-rooted trees under extreme mortality risk. The threat of large-scale wildfires becomes constant.",
       bubbles: [
-        { x: 20, y: 60, title: "Dry Riverbeds", text: "Small tributaries and streams begin to dry up seasonally due to the lack of forest transpiration and reduced rainfall.", Icon: AlertTriangle },
-        { x: 70, y: 30, title: "Fire Scars", text: "Evidence of understory fires that have weakened tree root systems and degraded overall forest resilience.", Icon: Flame },
+        { x: 20, y: 60, title: "Dry Riverbeds", text: "Small tributaries and streams begin to dry up seasonally due to the lack of forest transpiration and reduced rainfall.", Icon: ({ size, color }) => <Feather name="alert-triangle" size={size} color={color} /> },
+        { x: 70, y: 30, title: "Fire Scars", text: "Evidence of understory fires that have weakened tree root systems and degraded overall forest resilience.", Icon: ({ size, color }) => <Feather name="thermometer" size={size} color={color} /> }, // Mapped Flame to Thermometer
       ],
     },
     50: {
       description: "Savannization is now the dominant feature. Large, contiguous swathes of the rainforest have converted to semi-arid scrubland and savanna. The dense, multi-layered canopy has been broken, replaced by grass and fire-resistant shrubs. The former carbon sink is now close to becoming a major carbon emitter.",
       bubbles: [
-        { x: 40, y: 40, title: "Canopy Collapse", text: "Drought-intolerant hardwood trees die off, replaced by grass and low-density savanna foliage.", Icon: CloudOff },
-        { x: 60, y: 70, title: "Flash Droughts", text: "Soil moisture is critically low, leading to rapid die-offs of remaining forest patches.", Icon: Droplet },
+        { x: 40, y: 40, title: "Canopy Collapse", text: "Drought-intolerant hardwood trees die off, replaced by grass and low-density savanna foliage.", Icon: ({ size, color }) => <Feather name="cloud-off" size={size} color={color} /> },
+        { x: 60, y: 70, title: "Flash Droughts", text: "Soil moisture is critically low, leading to rapid die-offs of remaining forest patches.", Icon: ({ size, color }) => <Feather name="droplet" size={size} color={color} /> },
       ],
     },
     100: {
       description: "The ecosystem has changed fundamentally. The Amazon rainforest is reduced to isolated pockets (refugia) in the wettest regions, while the vast majority is now a dry savanna. This massive ecosystem change drastically reduces global carbon storage, acting as a powerful feedback loop that accelerates global warming further.",
       bubbles: [
-        { x: 50, y: 50, title: "Scrubland", text: "The former forest floor is now dominated by dry dirt and hardy, drought-tolerant grasses.", Icon: RefreshCcw },
-        { x: 30, y: 70, title: "Wildlife Loss", text: "Endemic species relying on the high canopy are extinct or functionally extinct.", Icon: AlertTriangle },
+        { x: 50, y: 50, title: "Scrubland", text: "The former forest floor is now dominated by dry dirt and hardy, drought-tolerant grasses.", Icon: ({ size, color }) => <Feather name="refresh-ccw" size={size} color={color} /> },
+        { x: 30, y: 70, title: "Wildlife Loss", text: "Endemic species relying on the high canopy are extinct or functionally extinct.", Icon: ({ size, color }) => <Feather name="alert-triangle" size={size} color={color} /> },
       ],
     },
   },
@@ -111,34 +109,34 @@ const SCENARIOS = {
     5: {
       description: "Marine heatwaves cause frequent, sporadic coral bleaching events. While some corals recover from mild events, the stress makes them extremely vulnerable to disease and impedes their growth. The overall reef structure remains intact, but the vibrant colors are starting to be replaced by patches of pale or sickly white coral.",
       bubbles: [
-        { x: 40, y: 60, title: "Pale Tips", text: "Coral tips turn white as they expel symbiotic algae (zooxanthellae) due to heat stress.", Icon: Sun },
+        { x: 40, y: 60, title: "Pale Tips", text: "Coral tips turn white as they expel symbiotic algae (zooxanthellae) due to heat stress.", Icon: ({ size, color }) => <Feather name="sun" size={size} color={color} /> },
       ],
     },
     10: {
       description: "Bleaching events now occur every two to three years, giving the coral insufficient time to fully recover. The slow-growing, complex branching corals are the first to die, leading to a significant drop in biodiversity as their specialized habitats disappear. Overall reef health is declining rapidly.",
       bubbles: [
-        { x: 20, y: 40, title: "Ghost Coral", text: "Large, visible colonies turn stark white during summer heat spikes, with mortality rates rising.", Icon: AlertTriangle },
-        { x: 70, y: 55, title: "Weedy Coral", text: "Fast-growing, less complex species dominate the remaining living areas.", Icon: Zap },
+        { x: 20, y: 40, title: "Ghost Coral", text: "Large, visible colonies turn stark white during summer heat spikes, with mortality rates rising.", Icon: ({ size, color }) => <Feather name="alert-triangle" size={size} color={color} /> },
+        { x: 70, y: 55, title: "Weedy Coral", text: "Fast-growing, less complex species dominate the remaining living areas.", Icon: ({ size, color }) => <Feather name="zap" size={size} color={color} /> },
       ],
     },
     25: {
       description: "Widespread structural collapse is evident across the central and northern sectors. The dead coral skeletons, which form the reef's structure, become weak and crumble, removing hiding places, nurseries, and feeding grounds for thousands of fish and invertebrate species. The reef profile flattens out, impacting coastal protection.",
       bubbles: [
-        { x: 60, y: 70, title: "Coral Rubble", text: "Dead coral breaks down into sand and rubble, drastically reducing habitable space.", Icon: CloudOff },
-        { x: 35, y: 75, title: "Ocean Acidification", text: "Corals struggle to build new calcium carbonate skeletons due to increasingly acidic waters.", Icon: Droplet },
+        { x: 60, y: 70, title: "Coral Rubble", text: "Dead coral breaks down into sand and rubble, drastically reducing habitable space.", Icon: ({ size, color }) => <Feather name="cloud-off" size={size} color={color} /> },
+        { x: 35, y: 75, title: "Ocean Acidification", text: "Corals struggle to build new calcium carbonate skeletons due to increasingly acidic waters.", Icon: ({ size, color }) => <Feather name="droplet" size={size} color={color} /> },
       ],
     },
     50: {
       description: "Algae and slime now dominate. Without living coral to compete, slimy green and brown turf algae smother the remaining reef structure, turning the once vibrant colors to a murky, uniform green. The system has shifted from a coral-dominated ecosystem to an algal-dominated one, profoundly changing the food web.",
       bubbles: [
-        { x: 50, y: 50, title: "Algal Bloom", text: "Thick mats of algae cover the remaining dead and dying rock structures.", Icon: Leaf },
-        { x: 25, y: 30, title: "Herbivore Decline", text: "Grazing fish can't keep up with the rate of algal growth.", Icon: RefreshCcw },
+        { x: 50, y: 50, title: "Algal Bloom", text: "Thick mats of algae cover the remaining dead and dying rock structures.", Icon: ({ size, color }) => <Feather name="leaf" size={size} color={color} /> },
+        { x: 25, y: 30, title: "Herbivore Decline", text: "Grazing fish can't keep up with the rate of algal growth.", Icon: ({ size, color }) => <Feather name="refresh-ccw" size={size} color={color} /> },
       ],
     },
     100: {
       description: "A relic ecosystem. The Great Barrier Reef, as a massive, complex biological structure, has effectively ceased to exist. While some heat-resistant 'super corals' or small patches may survive in deep water or sheltered pockets, the once biodiverse ecosystem is replaced by scattered, low-complexity habitats. The fishing and tourism industries are gone.",
       bubbles: [
-        { x: 30, y: 30, title: "Empty Waters", text: "Fish populations plummet as their complex nursery grounds disappear entirely.", Icon: AlertTriangle },
+        { x: 30, y: 30, title: "Empty Waters", text: "Fish populations plummet as their complex nursery grounds disappear entirely.", Icon: ({ size, color }) => <Feather name="alert-triangle" size={size} color={color} /> },
       ],
     },
   },
@@ -146,33 +144,33 @@ const SCENARIOS = {
     5: {
       description: "The Arctic ice pack sees a sharp decline in multi-year ice—the thick, old ice that survives multiple summers. The ice remaining is younger, thinner, and far more prone to melting completely. This is the period where visible changes accelerate rapidly due to the loss of reflective white surfaces.",
       bubbles: [
-        { x: 20, y: 70, title: "Melt Ponds", text: "Pools of dark blue water form on top of the ice, significantly absorbing more heat from the sun.", Icon: Sun },
+        { x: 20, y: 70, title: "Melt Ponds", text: "Pools of dark blue water form on top of the ice, significantly absorbing more heat from the sun.", Icon: ({ size, color }) => <Feather name="sun" size={size} color={color} /> },
       ],
     },
     10: {
       description: "Summer sea ice extent hits record lows almost every year. Polar bears, seals, and walruses are negatively impacted, as they rely on the ice for hunting and resting. Polar bears are forced onto land for longer periods, leading to greater human-wildlife conflict and starvation.",
       bubbles: [
-        { x: 60, y: 50, title: "Land Migration", text: "Animals dependent on the sea ice are seen scavenging on rocky shores for food.", Icon: AlertTriangle },
-        { x: 40, y: 30, title: "Thinner Ice", text: "Ice sheets break up earlier in the spring, making travel treacherous.", Icon: Zap },
+        { x: 60, y: 50, title: "Land Migration", text: "Animals dependent on the sea ice are seen scavenging on rocky shores for food.", Icon: ({ size, color }) => <Feather name="alert-triangle" size={size} color={color} /> },
+        { x: 40, y: 30, title: "Thinner Ice", text: "Ice sheets break up earlier in the spring, making travel treacherous.", Icon: ({ size, color }) => <Feather name="zap" size={size} color={color} /> },
       ],
     },
     25: {
       description: "Seasonal 'Blue Ocean Events' begin to occur regularly. The Arctic Ocean is functionally ice-free for several weeks in September. This profound environmental shift opens up the region to new international shipping lanes and resource extraction, introducing significant pollution and geopolitical risk.",
       bubbles: [
-        { x: 50, y: 50, title: "Open Water", text: "Vast expanses of dark ocean water replace white ice, accelerating global warming through increased heat absorption.", Icon: CloudOff },
+        { x: 50, y: 50, title: "Open Water", text: "Vast expanses of dark ocean water replace white ice, accelerating global warming through increased heat absorption.", Icon: ({ size, color }) => <Feather name="cloud-off" size={size} color={color} /> },
       ],
     },
     50: {
       description: "The surrounding permafrost thaws rapidly, destabilizing coastlines and releasing enormous quantities of methane, a potent greenhouse gas, into the atmosphere. Coastal erosion becomes catastrophic, destroying indigenous villages and infrastructure as the lack of sea ice removes the natural wave buffer.",
       bubbles: [
-        { x: 80, y: 60, title: "Coastal Erosion", text: "Shorelines collapse into the sea without the protective barrier of permanent ice.", Icon: AlertTriangle },
-        { x: 15, y: 50, title: "Methane Release", text: "Bubbles of methane gas rise from thawing tundra and frozen lakes.", Icon: Zap },
+        { x: 80, y: 60, title: "Coastal Erosion", text: "Shorelines collapse into the sea without the protective barrier of permanent ice.", Icon: ({ size, color }) => <Feather name="alert-triangle" size={size} color={color} /> },
+        { x: 15, y: 50, title: "Methane Release", text: "Bubbles of methane gas rise from thawing tundra and frozen lakes.", Icon: ({ size, color }) => <Feather name="zap" size={size} color={color} /> },
       ],
     },
     100: {
       description: "A permanently altered North Pole. The Arctic has become a new, seasonal ocean. The disappearance of year-round ice has fundamentally changed ocean currents and weather patterns globally. Traditional indigenous ways of life dependent on ice hunting and stable environments are now impossible, forcing mass cultural displacement.",
       bubbles: [
-        { x: 50, y: 50, title: "New Ecosystem", text: "Temperate marine species migrate north, displacing native polar life and changing the entire food web.", Icon: RefreshCcw },
+        { x: 50, y: 50, title: "New Ecosystem", text: "Temperate marine species migrate north, displacing native polar life and changing the entire food web.", Icon: ({ size, color }) => <Feather name="refresh-ccw" size={size} color={color} /> },
       ],
     },
   },
@@ -180,33 +178,33 @@ const SCENARIOS = {
     5: {
       description: "Increased sea level rise means that king tides cause nuisance flooding in low-lying streets several times a year. The thin lens of freshwater beneath the islands begins to taste subtly saltier due to seawater intrusion, challenging local drinking water supplies.",
       bubbles: [
-        { x: 20, y: 80, title: "Street Flooding", text: "High tides push water through storm drains and onto streets in inhabited areas.", Icon: Droplet },
+        { x: 20, y: 80, title: "Street Flooding", text: "High tides push water through storm drains and onto streets in inhabited areas.", Icon: ({ size, color }) => <Feather name="droplet" size={size} color={color} /> },
       ],
     },
     10: {
       description: "Beach and coastline erosion accelerates dramatically, becoming a major economic crisis. Resorts and local communities spend millions on reinforcement walls and pumping sand to maintain beaches, but the effort is often temporary. Some small, uninhabited islands begin to disappear completely.",
       bubbles: [
-        { x: 70, y: 60, title: "Eroded Palms", text: "Coconut palms lean precariously or fall as the sand and soil beneath them washes away.", Icon: AlertTriangle },
+        { x: 70, y: 60, title: "Eroded Palms", text: "Coconut palms lean precariously or fall as the sand and soil beneath them washes away.", Icon: ({ size, color }) => <Feather name="alert-triangle" size={size} color={color} /> },
       ],
     },
     25: {
       description: "A nationwide freshwater crisis hits as the groundwater is largely contaminated by saltwater. The islands are completely dependent on costly desalination plants. Frequent and intense storm surges regularly damage critical infrastructure, forcing significant investment in coastal defenses.",
       bubbles: [
-        { x: 40, y: 50, title: "Dead Gardens", text: "Local, salt-intolerant vegetation dies off as the groundwater becomes too saline.", Icon: CloudOff },
-        { x: 65, y: 30, title: "Taller Sea Walls", text: "Concrete flood barriers are constantly being reinforced and raised.", Icon: Zap },
+        { x: 40, y: 50, title: "Dead Gardens", text: "Local, salt-intolerant vegetation dies off as the groundwater becomes too saline.", Icon: ({ size, color }) => <Feather name="cloud-off" size={size} color={color} /> },
+        { x: 65, y: 30, title: "Taller Sea Walls", text: "Concrete flood barriers are constantly being reinforced and raised.", Icon: ({ size, color }) => <Feather name="zap" size={size} color={color} /> },
       ],
     },
     50: {
       description: "Mass abandonment begins. Lower-lying, outer-lying islands are deemed uninhabitable due to the frequency of severe wave overwash. Populations consolidate onto a few larger, protected natural islands or move entirely to elevated, artificial 'City Islands,' creating a major internal migration challenge.",
       bubbles: [
-        { x: 50, y: 70, title: "Submerged Infrastructure", text: "Old jetties, docks, and walkways are permanently underwater, decaying rapidly.", Icon: Droplet },
+        { x: 50, y: 70, title: "Submerged Infrastructure", text: "Old jetties, docks, and walkways are permanently underwater, decaying rapidly.", Icon: ({ size, color }) => <Feather name="droplet" size={size} color={color} /> },
       ],
     },
     100: {
       description: "The archipelago is functionally lost. Most natural islands are submerged reefs or have eroded away. The Maldivian people are forced to exist primarily on engineered, elevated concrete platforms, or have become climate refugees, migrating to other nations as their homeland can no longer support life.",
       bubbles: [
-        { x: 50, y: 50, title: "Underwater Ruins", text: "Remnants of former homes and buildings are visible beneath the clear, rising ocean water.", Icon: AlertTriangle },
-        { x: 30, y: 30, title: "Erosion Scars", text: "Only the highest central points of the largest islands remain above sea level.", Icon: RefreshCcw },
+        { x: 50, y: 50, title: "Underwater Ruins", text: "Remnants of former homes and buildings are visible beneath the clear, rising ocean water.", Icon: ({ size, color }) => <Feather name="alert-triangle" size={size} color={color} /> },
+        { x: 30, y: 30, title: "Erosion Scars", text: "Only the highest central points of the largest islands remain above sea level.", Icon: ({ size, color }) => <Feather name="refresh-ccw" size={size} color={color} /> },
       ],
     },
   },
@@ -214,148 +212,218 @@ const SCENARIOS = {
     5: {
       description: "Multi-year drought conditions have stressed the iconic pine forests, making them vulnerable to infestation. Bark beetles rapidly infect the weakened trees. Patches of brown, dead foliage appear amidst the green, transforming healthy forest into dangerous fuel for the next fire season.",
       bubbles: [
-        { x: 30, y: 40, title: "Brown Needles", text: "Dying pine trees turn rust-red as they succumb to beetles and chronic water stress.", Icon: Leaf },
+        { x: 30, y: 40, title: "Brown Needles", text: "Dying pine trees turn rust-red as they succumb to beetles and chronic water stress.", Icon: ({ size, color }) => <Feather name="leaf" size={size} color={color} /> },
       ],
     },
     10: {
       description: "Mega-fire impact becomes the defining ecological event. Scars from massive, high-intensity fires leave entire valleys charred. Smoke fills the valley floor for weeks every summer, causing public health alerts and forcing extended park closures during peak season.",
       bubbles: [
-        { x: 50, y: 50, title: "Charred Trunks", text: "Blackened tree skeletons stand where dense, mixed-conifer forest once thrived.", Icon: Flame },
-        { x: 70, y: 20, title: "Dusty Air", text: "Haze and smoke reduce visibility, obscuring famous landmarks like El Capitan.", Icon: CloudOff },
+        { x: 50, y: 50, title: "Charred Trunks", text: "Blackened tree skeletons stand where dense, mixed-conifer forest once thrived.", Icon: ({ size, color }) => <Feather name="thermometer" size={size} color={color} /> }, // Mapped Flame to Thermometer
+        { x: 70, y: 20, title: "Dusty Air", text: "Haze and smoke reduce visibility, obscuring famous landmarks like El Capitan.", Icon: ({ size, color }) => <Feather name="cloud-off" size={size} color={color} /> },
       ],
     },
     25: {
       description: "Forest retreat accelerates. Conifer forests, unable to withstand the chronic heat and drought, migrate to higher elevations. The lower elevations, including the valley floor, transition rapidly to more fire-tolerant scrub, oak, and chaparral ecosystems, fundamentally changing the landscape's character.",
       bubbles: [
-        { x: 70, y: 70, title: "Shrub Invasion", text: "Low-lying chaparral bushes replace the majestic Ponderosa and Sugar Pine forests.", Icon: RefreshCcw },
-        { x: 25, y: 60, title: "Erosion Risk", text: "Heavy rains on fire-scorched, unstable slopes lead to dangerous mudslides.", Icon: AlertTriangle },
+        { x: 70, y: 70, title: "Shrub Invasion", text: "Low-lying chaparral bushes replace the majestic Ponderosa and Sugar Pine forests.", Icon: ({ size, color }) => <Feather name="refresh-ccw" size={size} color={color} /> },
+        { x: 25, y: 60, title: "Erosion Risk", text: "Heavy rains on fire-scorched, unstable slopes lead to dangerous mudslides.", Icon: ({ size, color }) => <Feather name="alert-triangle" size={size} color={color} /> },
       ],
     },
     50: {
       description: "The vital winter snowpack disappears almost completely. Without this natural, slow-release reservoir, famous waterfalls like Yosemite Falls dry up entirely by early summer. The valley floor becomes arid and extremely hot, and the remaining giant sequoia groves face unprecedented mortality risk from intense ground fires.",
       bubbles: [
-        { x: 50, y: 30, title: "Dry Cliffside", text: "The famous waterfalls are reduced to a seasonal trickle or completely absent by June.", Icon: Droplet },
+        { x: 50, y: 30, title: "Dry Cliffside", text: "The famous waterfalls are reduced to a seasonal trickle or completely absent by June.", Icon: ({ size, color }) => <Feather name="droplet" size={size} color={color} /> },
       ],
     },
     100: {
       description: "A high-desert landscape is established. The lush, verdant Yosemite of the 20th century is gone, replaced by a biome resembling current-day Southern California chaparral or high-desert shrubland. The ecosystem is dominated by fire and drought, challenging the very existence of the National Park as we know it.",
       bubbles: [
-        { x: 50, y: 50, title: "Arid Rock", text: "Exposed granite dominates without the softening frame of green forests.", Icon: Sun },
-        { x: 20, y: 40, title: "Flash Flood Tracks", text: "Evidence of rare, intense rainstorms washing through dry riverbeds.", Icon: Zap },
+        { x: 50, y: 50, title: "Arid Rock", text: "Exposed granite dominates without the softening frame of green forests.", Icon: ({ size, color }) => <Feather name="sun" size={size} color={color} /> },
+        { x: 20, y: 40, title: "Flash Flood Tracks", text: "Evidence of rare, intense rainstorms washing through dry riverbeds.", Icon: ({ size, color }) => <Feather name="zap" size={size} color={color} /> },
       ],
     },
   },
 };
 
-// --- REACT COMPONENTS ---
+// --- ASYNC STORAGE HELPER FUNCTIONS (REPLACED LOCALSTORAGE) ---
+const LOCAL_STORAGE_KEY = 'futureWorldImagesCache';
 
-const TimelinePoint = ({ year, index, activeIndex, onSelect }) => (
-  <div className="flex flex-col items-center w-1/5 relative z-10">
-    <button 
-      onClick={() => onSelect(index)}
-      className={`
-        w-6 h-6 rounded-full border-4 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-offset-2
-        ${index <= activeIndex 
-          ? 'bg-green-600 border-green-800 focus:ring-green-400' 
-          : 'bg-white border-gray-300 hover:border-green-400 focus:ring-gray-300'}
-        ${activeIndex === index ? 'scale-125 shadow-lg' : 'hover:scale-110'}
-      `}
-      aria-label={`Select year +${year}`}
-    />
-    <span className={`text-sm mt-3 whitespace-nowrap transition-colors duration-300
-      ${activeIndex === index ? 'font-extrabold text-green-700' : 'text-gray-600 font-medium'}
-    `}>
-      +{year}
-    </span>
-  </div>
-);
+const loadCache = async () => {
+  try {
+    const serializedState = await AsyncStorage.getItem(LOCAL_STORAGE_KEY);
+    if (serializedState === null) {
+      return {};
+    }
+    return JSON.parse(serializedState);
+  } catch (e) {
+    console.warn("Could not load image cache from AsyncStorage", e);
+    return {};
+  }
+};
 
-const PlaceCard = ({ place, selectedId, onSelect }) => (
-  <button
-    onClick={() => onSelect(place.id)}
-    className={`
-      flex flex-col items-center p-3 rounded-xl transition-all duration-300 shadow-md min-w-[140px] mx-1.5 md:mx-2 focus:outline-none
-      ${selectedId === place.id 
-        ? 'bg-green-600 border-2 border-green-800 shadow-xl shadow-green-300/50 transform scale-[1.02]' 
-        : 'bg-white border border-gray-200 hover:bg-gray-50 hover:shadow-lg'}
-    `}
-  >
-    <div className={`p-2 rounded-full mb-2 transition-colors duration-300
-      ${selectedId === place.id ? 'bg-white' : 'bg-gray-100'}
-    `}>
-      <place.Icon size={24} className={selectedId === place.id ? 'text-green-600' : place.color} />
-    </div>
-    <span className={`text-sm font-semibold text-center leading-tight transition-colors duration-300
-      ${selectedId === place.id ? 'text-white' : 'text-gray-800'}
-    `}>
-      {place.name}
-    </span>
-  </button>
-);
+const saveCache = async (state) => {
+  try {
+    const serializedState = JSON.stringify(state);
+    await AsyncStorage.setItem(LOCAL_STORAGE_KEY, serializedState);
+  } catch (e) {
+    console.error("Could not save image cache to AsyncStorage", e);
+  }
+};
+// --- END ASYNC STORAGE HELPER FUNCTIONS ---
+
+
+// --- REACT NATIVE COMPONENTS ---
+
+const TimelinePoint = ({ year, index, activeIndex, onSelect }) => {
+  const isActive = index <= activeIndex;
+  const isSelected = index === activeIndex;
+
+  return (
+    <View style={styles.timelinePointContainer}>
+      <Pressable
+        onPress={() => onSelect(index)}
+        style={({ pressed }) => [
+          styles.timelineButtonBase,
+          isActive ? styles.timelineButtonActive : styles.timelineButtonInactive,
+          isSelected && styles.timelineButtonSelected,
+          { opacity: pressed ? 0.8 : 1 }
+        ]}
+      />
+      <Text style={[
+        styles.timelineTextBase,
+        isSelected ? styles.timelineTextSelected : styles.timelineTextNormal
+      ]}>
+        +{year}
+      </Text>
+    </View>
+  );
+};
+
+const PlaceCard = ({ place, selectedId, onSelect }) => {
+  const isSelected = selectedId === place.id;
+  // Convert Tailwind color classes to hex/rgba for RN styles
+  const colorMap = {
+      '#16A34A': { text: '#16A34A', bg: '#D1FAE5' }, // green-600
+      '#06B6D4': { text: '#06B6D4', bg: '#CCFBF1' }, // cyan-500
+      '#38BDF8': { text: '#38BDF8', bg: '#E0F2FE' }, // sky-400
+      '#F59E0B': { text: '#F59E0B', bg: '#FEF3C7' }, // yellow-500
+      '#EA580C': { text: '#EA580C', bg: '#FFEDD5' }, // orange-500
+  };
+  const iconColor = isSelected ? '#FFFFFF' : colorMap[place.color].text;
+  const placeCardStyle = { 
+    ...styles.placeCardBase,
+    backgroundColor: isSelected ? colorMap[place.color].text : '#FFFFFF', 
+    borderColor: isSelected ? colorMap[place.color].text : '#E5E7EB',
+  };
+  const iconWrapperStyle = { 
+    ...styles.placeIconWrapper,
+    backgroundColor: isSelected ? 'rgba(255,255,255,0.2)' : colorMap[place.color].bg,
+  };
+
+  return (
+    <Pressable
+      onPress={() => onSelect(place.id)}
+      style={({ pressed }) => [
+        placeCardStyle,
+        isSelected ? styles.placeCardSelectedShadow : styles.placeCardInactiveShadow,
+        { opacity: pressed ? 0.8 : 1 }
+      ]}
+    >
+      <View style={iconWrapperStyle}>
+        <place.Icon size={24} color={iconColor} />
+      </View>
+      <Text style={[
+        styles.placeCardText,
+        { color: isSelected ? '#FFFFFF' : '#1F2937' }
+      ]}>
+        {place.name}
+      </Text>
+    </Pressable>
+  );
+};
 
 const HotspotBubble = ({ bubble, index, activeBubble, setActiveBubble }) => {
   const isActive = activeBubble === index;
   
   const style = {
+    position: 'absolute',
     top: `${bubble.y}%`,
     left: `${bubble.x}%`,
   };
 
   return (
-    <div 
-      className="absolute z-20" 
-      style={style}
-    >
-      <button
-        onClick={() => setActiveBubble(isActive ? null : index)}
-        className={`
-          relative w-7 h-7 rounded-full border-3 transition-all duration-300 flex items-center justify-center 
-          ${isActive 
-            ? 'bg-red-600 border-red-800 scale-125 shadow-xl ring-4 ring-red-300 animate-pulse' 
-            : 'bg-white/70 border-red-500 hover:scale-110 hover:bg-white'}
-          focus:outline-none
-        `}
+    <View style={style}>
+      <Pressable
+        onPress={() => setActiveBubble(isActive ? null : index)}
+        style={({ pressed }) => [
+          styles.bubbleBase,
+          isActive ? styles.bubbleActive : styles.bubbleInactive,
+          isActive && styles.bubblePulse,
+          { opacity: pressed ? 0.8 : 1 }
+        ]}
       >
-        <bubble.Icon size={16} className={isActive ? 'text-white' : 'text-red-600'} />
-      </button>
+        <Feather name="alert-circle" size={16} color={isActive ? '#FFFFFF' : '#EF4444'} />
+      </Pressable>
 
       {/* Tooltip */}
       {isActive && (
-        <div 
-          className="absolute p-4 rounded-xl bg-gray-900 text-white shadow-2xl min-w-[250px] max-w-xs z-30 opacity-95 transition-opacity duration-300 border-t-4 border-red-500"
-          style={{
-            transform: `translate(${bubble.x > 50 ? '-100% -50%' : '20px -50%'})`,
-            [bubble.x > 50 ? 'right' : 'left']: bubble.x > 50 ? '10px' : '0px',
-            top: '50%',
-          }}
+        <View 
+          style={[
+            styles.tooltipBase,
+            bubble.x > 50 ? styles.tooltipRight : styles.tooltipLeft,
+          ]}
         >
-          <p className="font-bold text-base mb-1 text-red-300 flex items-center">
-            <Zap size={16} className="mr-1" />{bubble.title}
-          </p>
-          <p className="text-sm">{bubble.text}</p>
-        </div>
+          <Text style={styles.tooltipTitle}>
+            <Feather name="zap" size={16} color="#FCA5A5" /> {bubble.title}
+          </Text>
+          <Text style={styles.tooltipText}>{bubble.text}</Text>
+        </View>
       )}
-    </div>
+    </View>
   );
 };
 
 
-export default function App() {
+// --- MAIN APP COMPONENT ---
+
+export default function FutureWorld() {
   const [selectedPlaceId, setSelectedPlaceId] = useState('amazon');
-  const [yearIndex, setYearIndex] = useState(0); // 0 to 4 (5, 10, 25, 50, 100)
+  const [yearIndex, setYearIndex] = useState(0); 
   const [activeBubble, setActiveBubble] = useState(null);
-  const [generatedImages, setGeneratedImages] = useState({}); // Cache for generated images
+  
+  const [generatedImages, setGeneratedImages] = useState({});
+  const [isCacheLoaded, setIsCacheLoaded] = useState(false);
   const [isLoadingImage, setIsLoadingImage] = useState(false);
+
+  // Load cache on mount
+  useEffect(() => {
+    loadCache().then(cache => {
+      setGeneratedImages(cache);
+      setIsCacheLoaded(true);
+    });
+  }, []);
 
   const currentYear = YEARS[yearIndex];
   const scenarioKey = `${selectedPlaceId}_${currentYear}`;
-  const currentScenario = SCENARIOS[selectedPlaceId][currentYear];
-  const currentPrompt = IMAGE_PROMPTS[selectedPlaceId][currentYear];
+  const currentScenario = SCENARIOS[selectedPlaceId] ? SCENARIOS[selectedPlaceId][currentYear] : null;
+  const currentPrompt = IMAGE_PROMPTS[selectedPlaceId] ? IMAGE_PROMPTS[selectedPlaceId][currentYear] : null;
   const currentImage = generatedImages[scenarioKey];
+  
+  // Guard against missing scenario data
+  if (!currentScenario || !currentPrompt) {
+      console.error("Missing configuration data for current scenario:", selectedPlaceId, currentYear);
+      // Fallback to a basic loading screen if config is missing
+      return (
+          <View style={styles.loadingContainer}>
+              <Text>Configuration Error: Missing data for {selectedPlaceId} +{currentYear} years.</Text>
+          </View>
+      );
+  }
 
   // Function to handle image generation with exponential backoff
   const generateImage = useCallback(async (prompt, key) => {
-    if (generatedImages[key] && generatedImages[key] !== 'error') return; // Already cached
+    if (!isCacheLoaded) return; 
+    if (generatedImages[key] && generatedImages[key] !== 'error') return; 
     
     setIsLoadingImage(true);
     let attempts = 0;
@@ -365,10 +433,7 @@ export default function App() {
       try {
         const payload = { 
           instances: [{ prompt: prompt }], 
-          parameters: { 
-            "sampleCount": 1,
-            "aspectRatio": "16:9" // Cinematic aspect ratio for impact
-          } 
+          parameters: { "sampleCount": 1, "aspectRatio": "16:9" } 
         };
         
         const response = await fetch(IMAGE_API_URL, {
@@ -385,171 +450,612 @@ export default function App() {
         
         if (result.predictions && result.predictions.length > 0 && result.predictions[0].bytesBase64Encoded) {
           const base64Data = result.predictions[0].bytesBase64Encoded;
-          const imageUrl = `data:image/png;base64,${base64Data}`;
-          setGeneratedImages(prev => ({ ...prev, [key]: imageUrl }));
+          const imageURL = `data:image/png;base64,${base64Data}`;
+
+          setGeneratedImages(prev => {
+            const newCache = { ...prev, [key]: imageURL };
+            saveCache(newCache); 
+            return newCache;
+          });
+          
           setIsLoadingImage(false);
-          return;
+          return; 
         } else {
-           throw new Error("Image prediction failed or returned no data.");
+          throw new Error("Image generation failed or returned empty result.");
         }
 
       } catch (error) {
+        console.error(`Attempt ${attempts + 1} failed for ${key}:`, error);
         attempts++;
         if (attempts >= maxAttempts) {
-          console.error(`Failed to generate image for ${key} after ${maxAttempts} attempts:`, error);
-          // Set a failure placeholder
-          setGeneratedImages(prev => ({ ...prev, [key]: 'error' })); 
+          setGeneratedImages(prev => {
+            const newCache = { ...prev, [key]: 'error' };
+            saveCache(newCache); 
+            return newCache;
+          });
           setIsLoadingImage(false);
-          return;
+          return; 
         }
-        const delay = Math.pow(2, attempts) * 1000;
+        const delay = Math.pow(2, attempts) * 1000 + Math.random() * 1000;
         await new Promise(resolve => setTimeout(resolve, delay));
       }
     }
-  }, [generatedImages]);
+  }, [generatedImages, isCacheLoaded]);
 
-  // Effect to trigger image generation when scenario changes and image is not cached
+
+  // useEffect to trigger image generation whenever the scenario changes
   useEffect(() => {
-    if (!generatedImages[scenarioKey] || generatedImages[scenarioKey] === 'error') {
-      generateImage(currentPrompt, scenarioKey);
-    }
-  }, [scenarioKey, currentPrompt, generateImage, generatedImages]);
+    if (!isCacheLoaded) return; 
+    const key = `${selectedPlaceId}_${currentYear}`;
+    const prompt = IMAGE_PROMPTS[selectedPlaceId][currentYear];
 
-  // Reset active bubble when place or year changes
-  useEffect(() => {
-    setActiveBubble(null);
-  }, [selectedPlaceId, yearIndex]);
+    setActiveBubble(null); 
+    generateImage(prompt, key);
+  }, [selectedPlaceId, yearIndex, currentYear, generateImage, isCacheLoaded]);
 
-  const handlePlaceSelect = (id) => {
-    setSelectedPlaceId(id);
-  };
 
-  const handleYearChange = (index) => {
-    setYearIndex(index);
-  };
+  if (!isCacheLoaded) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#10B981" />
+        <Text style={{ marginTop: 10, color: '#6B7280' }}>Loading environment...</Text>
+      </View>
+    );
+  }
 
-  const currentPlaceName = PLACES.find(p => p.id === selectedPlaceId)?.name || 'Region';
+  // Find the current place name for alt text
+  const currentPlaceName = PLACES.find(p => p.id === selectedPlaceId)?.name || 'Ecosystem';
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 md:p-8 font-inter">
-      
-      {/* Container for content - better centering and maximum width */}
-      <div className="max-w-6xl mx-auto">
+    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+      <View style={styles.header}>
+        <Text style={styles.title}>Global Climate Futures</Text>
+        <Text style={styles.subtitle}>
+          Visualize the impact of climate change on critical global hotspots over time.
+        </Text>
+      </View>
+
+      {/* Place Selection */}
+      <View style={styles.placeSelectionContainer}>
+        <Text style={styles.placeSelectionTitle}>Select a Critical Ecosystem:</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.placeCardWrapper}>
+          {PLACES.map(place => (
+            <PlaceCard 
+              key={place.id}
+              place={place}
+              selectedId={selectedPlaceId}
+              onSelect={id => {
+                setSelectedPlaceId(id);
+                setYearIndex(0); 
+              }}
+            />
+          ))}
+        </ScrollView>
+      </View>
+
+      {/* Main Content Area */}
+      <View style={styles.mainContentArea}>
         
-        {/* Header - Enhanced */}
-        <header className="bg-white rounded-3xl shadow-2xl p-6 md:p-8 mb-8 border-t-8 border-green-600">
-          <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">Future World Simulator</h1>
-          <p className="text-lg text-gray-500 mt-2 font-medium">Visualize climate impact based on current scientific trajectories for key global regions.</p>
-        </header>
-
-        {/* 1. TOP SLIDER: Places */}
-        <div className="mb-10 p-4 bg-white rounded-xl shadow-lg">
-          <h2 className="text-lg font-bold uppercase text-gray-700 mb-4 tracking-wider border-b pb-2">
-            Select a Region
-          </h2>
-          <div className="flex overflow-x-auto pb-3 -mx-2 px-2 space-x-3 md:space-x-5 scrollbar-hide">
-            {PLACES.map((place) => (
-              <PlaceCard 
-                key={place.id}
-                place={place}
-                selectedId={selectedPlaceId}
-                onSelect={handlePlaceSelect}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* Current State Indicator */}
-        <div className="text-center mb-6">
-          <h2 className="text-3xl font-extrabold text-gray-800 p-3 bg-white/70 rounded-lg inline-block shadow-inner border border-gray-200">
-            <span className="text-red-600">{currentPlaceName}</span>: Projection <span className="text-green-600">+{currentYear} Years</span>
-          </h2>
-        </div>
-
-        {/* 2. MIDDLE: Image & Bubbles */}
-        <div className="relative w-full aspect-video rounded-2xl shadow-2xl overflow-hidden bg-gray-300 mb-8 border-4 border-gray-400">
-          
-          {isLoadingImage ? (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-900/90 text-white z-10 p-4">
-              <Loader2 className="animate-spin text-green-400" size={64} />
-              <p className="mt-6 text-2xl font-semibold">Generating Visual Projection...</p>
-              <p className="text-base text-gray-300 max-w-sm text-center mt-2">
-                Creating the unique, realistic scenario for {currentPlaceName} in {currentYear} years. This may take a moment.
-              </p>
-            </div>
-          ) : currentImage === 'error' ? (
-             <div className="absolute inset-0 flex flex-col items-center justify-center bg-red-800/90 z-10 p-4">
-              <AlertTriangle className="text-white" size={40} />
-              <p className="mt-4 text-white font-bold text-xl">Image Generation Failed</p>
-              <p className="text-base text-red-200 max-w-md text-center mt-2">
-                Could not load the visual projection. Please check your API key setup or try switching scenarios and try again later.
-              </p>
-            </div>
-          ) : currentImage ? (
-            <>
-              <img
-                src={currentImage}
-                alt={`${selectedPlaceId} scenario at +${currentYear} years`}
-                className="w-full h-full object-cover transition-opacity duration-500"
-              />
-              {/* Interactive Hotspots */}
-              {currentScenario.bubbles.map((bubble, index) => (
-                <HotspotBubble
-                  key={index}
-                  bubble={bubble}
-                  index={index}
-                  activeBubble={activeBubble}
-                  setActiveBubble={setActiveBubble}
-                />
-              ))}
-              <div className="absolute top-4 right-4 bg-gray-900/70 text-white text-sm p-2 px-3 rounded-lg z-10 font-medium flex items-center shadow-lg">
-                 <Zap size={16} className="text-yellow-300 mr-2" />
-                 Tap the red indicators for Impact Hotspots.
-              </div>
-            </>
-          ) : null}
-        </div>
-
-        {/* 3. BOTTOM SLIDER: Years (Stepped Timeline) */}
-        <div className="p-8 bg-white rounded-xl shadow-2xl mb-8 border-b-4 border-gray-300">
-          <h2 className="text-lg font-bold uppercase text-gray-700 mb-6 tracking-wider">
-            Projection Timeline
-          </h2>
-          <div className="relative flex justify-between items-center px-4">
-            {/* Timeline Track Line */}
-            <div className="absolute top-[27px] left-0 right-0 h-1 bg-gray-200 mx-4 -translate-y-1/2 z-0">
-                {/* Active Progress Line */}
-                <div 
-                    className="h-full bg-green-500 transition-all duration-300 rounded-full" 
-                    style={{ width: `${(yearIndex / (YEARS.length - 1)) * 100}%` }}
-                />
-            </div>
-
+        {/* Timeline */}
+        <View style={styles.timelineArea}>
+          <View style={styles.timelineLine}>
+            <View 
+              style={[
+                styles.timelineProgress, 
+                { width: `${(yearIndex / (YEARS.length - 1)) * 100}%` }
+              ]} 
+            />
+          </View>
+          <View style={styles.timelinePointsWrapper}>
             {YEARS.map((year, index) => (
               <TimelinePoint
                 key={year}
                 year={year}
                 index={index}
                 activeIndex={yearIndex}
-                onSelect={handleYearChange}
+                onSelect={setYearIndex}
               />
             ))}
-          </div>
-        </div>
+          </View>
+        </View>
+        
+        {/* Scenario Header */}
+        <View style={styles.scenarioHeader}>
+          <Text style={styles.scenarioTitle}>
+            <Feather name="alert-triangle" size={24} color="#EF4444" />
+            {' '}Scenario: 
+            <Text style={styles.scenarioYearText}> +{currentYear} Years</Text>
+          </Text>
+          <Text style={styles.scenarioSubtitle}>
+            Click on the red hotspots in the image below to learn more.
+          </Text>
+        </View>
 
-        {/* 4. EXPLANATION TEXT */}
-        <div className="p-8 bg-white rounded-xl shadow-2xl border-l-8 border-red-500">
-          <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-            <MessageSquare size={24} className="mr-2 text-red-500" />
-            Detailed Scientific Explanation
-          </h3>
-          <p className="text-gray-700 leading-relaxed text-lg">
-            {currentScenario.description}
-          </p>
-        </div>
+        {/* Image and Description Layout */}
+        <View style={styles.imageDescriptionLayout}>
+          
+          {/* Image/Visualization Area */}
+          <View style={styles.imageVisualizationArea}>
+            {isLoadingImage && (
+              <View style={styles.imageOverlay}>
+                <ActivityIndicator size="large" color="#10B981" />
+                <Text style={styles.overlayText}>Generating future scenario visualization...</Text>
+                <Text style={styles.overlaySmallText}>AI generation in progress</Text>
+              </View>
+            )}
 
-        <div className="h-10" />
-      </div>
-    </div>
+            {currentImage === 'error' && !isLoadingImage && (
+              <View style={styles.imageErrorBox}>
+                <Feather name="alert-triangle" size={32} color="#B91C1C" />
+                <Text style={styles.errorTitle}>Image Generation Error</Text>
+                <Text style={styles.errorText}>Could not generate a visualization for this scenario.</Text>
+              </View>
+            )}
+
+            {currentImage && currentImage !== 'error' && (
+              <View style={styles.imageWrapper}>
+                <Image 
+                  source={{ uri: currentImage }}
+                  style={[
+                    styles.scenarioImage,
+                    { opacity: isLoadingImage ? 0.3 : 1 }
+                  ]}
+                  resizeMode="cover"
+                  accessibilityLabel={`Future scenario for ${currentPlaceName} in +${currentYear} years.`}
+                />
+                
+                {/* Hotspots Overlay */}
+                <View style={styles.hotspotsOverlay}>
+                  {currentScenario.bubbles.map((bubble, index) => (
+                    <HotspotBubble
+                      key={index}
+                      bubble={bubble}
+                      index={index}
+                      activeBubble={activeBubble}
+                      setActiveBubble={setActiveBubble}
+                    />
+                  ))}
+                </View>
+              </View>
+            )}
+          </View>
+
+          {/* Description Area */}
+          <View style={styles.descriptionArea}>
+            <View>
+              <Text style={styles.descriptionTitle}>
+                <Feather name="message-square" size={20} color="#10B981" />
+                {' '}Scientific Summary
+              </Text>
+              <Text style={styles.descriptionText}>
+                {currentScenario.description}
+              </Text>
+            </View>
+            <View style={styles.footerNote}>
+              <Text style={styles.footerNoteText}>
+                Visualization powered by Imagen 4.0 API. Scenarios are based on projected high-emission climate pathways.
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+
+      {/* Footer */}
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>
+          Select a place and move the timeline to explore different climate impacts.
+        </Text>
+      </View>
+    </ScrollView>
   );
 }
+
+// --- STYLESHEET (Manual Tailwind/CSS to RN Style Translation) ---
+
+const { width } = Dimensions.get('window');
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F9FAFB',
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#F9FAFB',
+  },
+  contentContainer: {
+    padding: 16,
+    paddingTop: Platform.OS === 'android' ? 30 : 0,
+    minHeight: '100%',
+  },
+  header: {
+    alignItems: 'center',
+    marginBottom: 40,
+    fontFamily: 'Quicksand-Medium'
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: '800',
+    color: '#1F2937',
+    textAlign: 'center',
+    fontFamily: 'Quicksand-Bold',
+    marginTop: 7,
+  },
+  subtitle: {
+    fontSize: 18,
+    color: '#4B5563',
+    marginTop: 8,
+    maxWidth: width * 0.9,
+    textAlign: 'center',
+    fontFamily: 'Quicksand-Medium'
+  },
+
+  // Place Selection
+  placeSelectionContainer: {
+    marginBottom: 32,
+  },
+  placeSelectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#374151',
+    marginBottom: 16,
+    textAlign: 'center',
+    fontFamily: 'Quicksand-Medium'
+  },
+  placeCardWrapper: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 12,
+    paddingHorizontal: 10,
+    paddingBottom: 5,
+  },
+  placeCardBase: {
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    minWidth: 120,
+    marginHorizontal: 6,
+  },
+  placeCardSelectedShadow: {
+    shadowColor: '#10B981',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 8,
+    transform: [{ scale: 1.02 }],
+  },
+  placeCardInactiveShadow: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  placeIconWrapper: {
+    padding: 8,
+    borderRadius: 9999,
+    marginBottom: 8,
+  },
+  placeCardText: {
+    fontSize: 13,
+    fontWeight: '600',
+    textAlign: 'center',
+    lineHeight: 18,
+    fontFamily: 'Quicksand-Medium'
+  },
+
+  // Main Content Area
+  mainContentArea: {
+    backgroundColor: '#FFFFFF',
+    padding: 24,
+    borderRadius: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: '#F3F4F6',
+  },
+
+  // Timeline
+  timelineArea: {
+    marginBottom: 32,
+    paddingTop: 16,
+  },
+  timelineLine: {
+    position: 'absolute',
+    top: '50%',
+    left: 24,
+    right: 24,
+    height: 4,
+    backgroundColor: '#E5E7EB',
+    borderRadius: 9999,
+    marginTop: 10,
+  },
+  timelineProgress: {
+    position: 'absolute',
+    height: '100%',
+    backgroundColor: '#10B981',
+    borderRadius: 9999,
+  },
+  timelinePointsWrapper: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  timelinePointContainer: {
+    alignItems: 'center',
+    width: '20%',
+    zIndex: 10,
+  },
+  timelineButtonBase: {
+    width: 24,
+    height: 24,
+    borderRadius: 9999,
+    borderWidth: 4,
+    borderColor: '#9CA3AF',
+  },
+  timelineButtonActive: {
+    backgroundColor: '#10B981',
+    borderColor: '#059669',
+  },
+  timelineButtonInactive: {
+    backgroundColor: '#FFFFFF',
+    borderColor: '#D1D5DB',
+  },
+  timelineButtonSelected: {
+    transform: [{ scale: 1.25 }],
+    shadowColor: '#10B981',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    elevation: 6,
+  },
+  timelineTextBase: {
+    fontSize: 12,
+    marginTop: 12,
+    fontFamily: 'Quicksand-Medium'
+  },
+  timelineTextSelected: {
+    fontWeight: '800',
+    color: '#059669',
+    fontFamily: 'Quicksand-Medium'
+  },
+  timelineTextNormal: {
+    color: '#4B5563',
+    fontWeight: '500',
+    fontFamily: 'Quicksand-Medium'
+  },
+
+  // Scenario Header
+  scenarioHeader: {
+    marginBottom: 24,
+    alignItems: 'center',
+  },
+  scenarioTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#1F2937',
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+    textAlign: 'center',
+    fontFamily: 'Quicksand-Medium'
+  },
+  scenarioYearText: {
+    color: '#EF4444',
+    marginLeft: 8,
+    fontFamily: 'Quicksand-Medium'
+  },
+  scenarioSubtitle: {
+    fontSize: 16,
+    color: '#4B5563',
+    fontStyle: 'italic',
+    textAlign: 'center',
+    fontFamily: 'Quicksand-Medium'
+  },
+
+  // Image Area
+  imageDescriptionLayout: {
+    flexDirection: Dimensions.get('window').width > 768 ? 'row' : 'column',
+    gap: 16,
+  },
+  imageVisualizationArea: {
+    flex: Dimensions.get('window').width > 768 ? 2 : 1, // 2/3 width on large screens
+    backgroundColor: '#F3F4F6',
+    borderRadius: 12,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+    aspectRatio: 16 / 9,
+    marginBottom: Dimensions.get('window').width > 768 ? 0 : 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  imageWrapper: {
+    width: '100%',
+    height: '100%',
+    position: 'relative',
+  },
+  scenarioImage: {
+    width: '100%',
+    height: '100%',
+  },
+  imageOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(249, 250, 251, 0.9)',
+    zIndex: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  overlayText: {
+    marginTop: 16,
+    color: '#374151',
+    fontWeight: '600',
+    textAlign: 'center',
+    fontFamily: 'Quicksand-Medium'
+  },
+  overlaySmallText: {
+    fontSize: 12,
+    color: '#6B7280',
+    fontStyle: 'bold',
+    textAlign: 'center',
+    fontFamily: 'Quicksand-Medium'
+  },
+  imageErrorBox: {
+    padding: 24,
+    margin: 16,
+    backgroundColor: '#FEE2E2',
+    borderColor: '#FCA5A5',
+    borderWidth: 1,
+    borderRadius: 8,
+    alignItems: 'center',
+    textAlign: 'center',
+  },
+  errorTitle: {
+    fontWeight: '600',
+    color: '#B91C1C',
+    marginTop: 12,
+    fontFamily: 'Quicksand-Medium'
+  },
+  errorText: {
+    fontSize: 14,
+    color: '#B91C1C',
+    textAlign: 'center',
+    fontFamily: 'Quicksand-Medium'
+  },
+
+  // Hotspots
+  hotspotsOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 10,
+  },
+  bubbleBase: {
+    width: 28,
+    height: 28,
+    borderRadius: 9999,
+    borderWidth: 3,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  bubbleActive: {
+    backgroundColor: '#DC2626',
+    borderColor: '#7F1D1D',
+    transform: [{ scale: 1.25 }],
+  },
+  bubbleInactive: {
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    borderColor: '#EF4444',
+  },
+  bubblePulse: {
+    shadowColor: '#DC2626',
+    shadowOpacity: 1,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  tooltipBase: {
+    position: 'absolute',
+    padding: 16,
+    borderRadius: 12,
+    backgroundColor: 'rgba(31, 41, 55, 0.95)',
+    minWidth: 200,
+    maxWidth: 250,
+    zIndex: 30,
+    borderTopWidth: 4,
+    borderTopColor: '#EF4444',
+  },
+  tooltipLeft: {
+    left: 20,
+    top: '50%',
+    transform: [{ translateY: -25 }],
+  },
+  tooltipRight: {
+    right: 10,
+    top: '50%',
+    transform: [{ translateY: -25 }],
+  },
+  tooltipTitle: {
+    fontWeight: '700',
+    fontSize: 16,
+    marginBottom: 4,
+    color: '#FCA5A5',
+    flexDirection: 'row',
+    alignItems: 'center',
+    fontFamily: 'Quicksand-Medium'
+  },
+  tooltipText: {
+    fontSize: 14,
+    color: '#D1D5DB',
+    fontFamily: 'Quicksand-Medium'
+  },
+
+  // Description Area
+  descriptionArea: {
+    flex: Dimensions.get('window').width > 768 ? 1 : 1, // 1/3 width on large screens
+    padding: 16,
+    backgroundColor: '#F9FAFB',
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    justifyContent: 'space-between',
+  },
+  descriptionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1F2937',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+    paddingBottom: 8,
+    marginBottom: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    fontFamily: 'Quicksand-Medium'
+  },
+  descriptionText: {
+    color: '#374151',
+    lineHeight: 24,
+    fontSize: 16,
+    fontFamily: 'Quicksand-Medium'
+  },
+  footerNote: {
+    marginTop: 16,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+  },
+  footerNoteText: {
+    fontSize: 10,
+    color: '#6B7280',
+    fontStyle: 'bold',
+    fontFamily: 'Quicksand-Medium'
+  },
+
+  // Footer
+  footer: {
+    marginTop: 30,
+    marginBottom: 20,
+    alignItems: 'center',
+  },
+  footerText: {
+    fontSize: 12,
+    color: '#6B7280',
+    fontFamily: 'Quicksand-Medium'
+  }
+});
