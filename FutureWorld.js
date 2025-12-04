@@ -1,8 +1,69 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { RefreshCcw, Leaf, Droplet, Snowflake, Sun, Flame, MessageSquare, AlertTriangle, Zap, CloudOff, Loader2 } from 'lucide-react';
+// Note: Removed the lucide-react import to resolve the 'unable to resolve' error.
+// The icons are now defined as inline SVG components below.
 
 const API_KEY = ""; // Managed by the environment
 const IMAGE_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=" + API_KEY;
+
+// --- INLINE SVG ICONS (Replaces lucide-react) ---
+// Define each icon as a functional component that returns SVG markup
+const RefreshCcw = ({ size = 24, className = '' }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.76 2.76L3 8" /><path d="M3 3v5h5" /><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.76-2.76L21 16" /><path d="M21 21v-5h-5" />
+  </svg>
+);
+const Leaf = ({ size = 24, className = '' }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 16 11.6 15.5 14c-.6 2.3-3.6 5.5-5.8 5.9-1.4.3-2.5-.4-2.8-1.7C5.8 17.5 7 13.5 11 20z" /><path d="M2 21c3.5-3 6-5.5 11.5-6" />
+  </svg>
+);
+const Droplet = ({ size = 24, className = '' }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+  </svg>
+);
+const Snowflake = ({ size = 24, className = '' }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <line x1="2" x2="22" y1="12" y2="12" /><line x1="12" x2="12" y1="2" y2="22" /><path d="m20 16-8-4-8 4" /><path d="m4 8 8 4 8-4" /><path d="m16 4-4 8-4-8" /><path d="m8 20 4-8 4 8" />
+  </svg>
+);
+const Sun = ({ size = 24, className = '' }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <circle cx="12" cy="12" r="4" /><path d="M12 2v2" /><path d="M12 20v2" /><path d="M22 12h-2" /><path d="M4 12H2" /><path d="M18.36 5.64l-1.48 1.48" /><path d="M6.07 17.93l-1.48 1.48" /><path d="M17.93 17.93l1.48 1.48" /><path d="M5.64 5.64l1.48 1.48" />
+  </svg>
+);
+const Flame = ({ size = 24, className = '' }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.24.7-2.65 1.7-3.66 1.48-1.6 4.5-1.9 4.5-1.9H12s-3.5 1.5-3.5 3c0 1.25.9 2.5 2 3.5.5.5 1 1.2 1.5 2-.45.92-1.4 1.5-2.5 1.5z" /><path d="M22 21.5-14-14" />
+  </svg>
+);
+const MessageSquare = ({ size = 24, className = '' }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+  </svg>
+);
+const AlertTriangle = ({ size = 24, className = '' }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" /><line x1="12" x2="12" y1="9" y2="13" /><line x1="12" x2="12.01" y1="17" y2="17" />
+  </svg>
+);
+const Zap = ({ size = 24, className = '' }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+  </svg>
+);
+const CloudOff = ({ size = 24, className = '' }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M22.61 10.21A5 5 0 0 0 18 6H9a5 5 0 0 0-3.8-1.58M3 3l18 18" /><path d="M7.5 17.16a5 5 0 0 0 6.64-6.32" />
+  </svg>
+);
+const Loader2 = ({ size = 24, className = '' }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+  </svg>
+);
+// --- END INLINE SVG ICONS ---
+
 
 // --- CONFIGURATION ---
 const PLACES = [
@@ -15,7 +76,7 @@ const PLACES = [
 
 const YEARS = [5, 10, 25, 50, 100];
 
-// Detailed image generation prompts for all 25 scenarios
+// Detailed image generation prompts for all 25 scenarios (No change)
 const IMAGE_PROMPTS = {
   amazon: {
     5: "Cinematic, realistic photo of a fragmenting Amazon Rainforest edge. Show subtle signs of stress: slightly dry leaves, a new dirt road cutting into the dense jungle. Deep green and brown tones. Professional aesthetic.",
@@ -54,7 +115,7 @@ const IMAGE_PROMPTS = {
   },
 };
 
-// Scientific Explanations & Hotspot Data
+// Scientific Explanations & Hotspot Data (Icon references updated to use inline SVGs)
 const SCENARIOS = {
   amazon: {
     5: {
@@ -324,7 +385,7 @@ export default function App() {
   const currentPrompt = IMAGE_PROMPTS[selectedPlaceId][currentYear];
   const currentImage = generatedImages[scenarioKey];
 
-  // Function to handle image generation with exponential backoff
+  // Function to handle image generation with exponential backoff (No change)
   const generateImage = useCallback(async (prompt, key) => {
     if (generatedImages[key]) return; // Already cached
     
@@ -379,14 +440,14 @@ export default function App() {
     }
   }, [generatedImages]);
 
-  // Effect to trigger image generation when scenario changes and image is not cached
+  // Effect to trigger image generation when scenario changes and image is not cached (No change)
   useEffect(() => {
     if (!generatedImages[scenarioKey] || generatedImages[scenarioKey] === 'error') {
       generateImage(currentPrompt, scenarioKey);
     }
   }, [scenarioKey, currentPrompt, generateImage, generatedImages]);
 
-  // Reset active bubble when place or year changes
+  // Reset active bubble when place or year changes (No change)
   useEffect(() => {
     setActiveBubble(null);
   }, [selectedPlaceId, yearIndex]);
