@@ -1,69 +1,23 @@
 import React, { useState, useEffect, useCallback } from 'react';
-// Note: Removed the lucide-react import to resolve the 'unable to resolve' error.
-// The icons are now defined as inline SVG components below.
+// Note: Inline SVG Icons are used to resolve the 'unable to resolve lucide-react' error.
+
+// --- INLINE SVG ICONS (Replaces lucide-react) ---
+const RefreshCcw = ({ size = 24, className = '' }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.76 2.76L3 8" /><path d="M3 3v5h5" /><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.76-2.76L21 16" /><path d="M21 21v-5h-5" /></svg>);
+const Leaf = ({ size = 24, className = '' }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 16 11.6 15.5 14c-.6 2.3-3.6 5.5-5.8 5.9-1.4.3-2.5-.4-2.8-1.7C5.8 17.5 7 13.5 11 20z" /><path d="M2 21c3.5-3 6-5.5 11.5-6" /></svg>);
+const Droplet = ({ size = 24, className = '' }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" /></svg>);
+const Snowflake = ({ size = 24, className = '' }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="2" x2="22" y1="12" y2="12" /><line x1="12" x2="12" y1="2" y2="22" /><path d="m20 16-8-4-8 4" /><path d="m4 8 8 4 8-4" /><path d="m16 4-4 8-4-8" /><path d="m8 20 4-8 4 8" /></svg>);
+const Sun = ({ size = 24, className = '' }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="4" /><path d="M12 2v2" /><path d="M12 20v2" /><path d="M22 12h-2" /><path d="M4 12H2" /><path d="M18.36 5.64l-1.48 1.48" /><path d="M6.07 17.93l-1.48 1.48" /><path d="M17.93 17.93l1.48 1.48" /><path d="M5.64 5.64l1.48 1.48" /></svg>);
+const Flame = ({ size = 24, className = '' }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.24.7-2.65 1.7-3.66 1.48-1.6 4.5-1.9 4.5-1.9H12s-3.5 1.5-3.5 3c0 1.25.9 2.5 2 3.5.5.5 1 1.2 1.5 2-.45.92-1.4 1.5-2.5 1.5z" /><path d="M22 21.5-14-14" /></svg>);
+const MessageSquare = ({ size = 24, className = '' }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>);
+const AlertTriangle = ({ size = 24, className = '' }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" /><line x1="12" x2="12" y1="9" y2="13" /><line x1="12" x2="12.01" y1="17" y2="17" /></svg>);
+const Zap = ({ size = 24, className = '' }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>);
+const CloudOff = ({ size = 24, className = '' }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22.61 10.21A5 5 0 0 0 18 6H9a5 5 0 0 0-3.8-1.58M3 3l18 18" /><path d="M7.5 17.16a5 5 0 0 0 6.64-6.32" /></svg>);
+const Loader2 = ({ size = 24, className = '' }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>);
+// --- END INLINE SVG ICONS ---
+
 
 const API_KEY = ""; // Managed by the environment
 const IMAGE_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=" + API_KEY;
-
-// --- INLINE SVG ICONS (Replaces lucide-react) ---
-// Define each icon as a functional component that returns SVG markup
-const RefreshCcw = ({ size = 24, className = '' }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.76 2.76L3 8" /><path d="M3 3v5h5" /><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.76-2.76L21 16" /><path d="M21 21v-5h-5" />
-  </svg>
-);
-const Leaf = ({ size = 24, className = '' }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 16 11.6 15.5 14c-.6 2.3-3.6 5.5-5.8 5.9-1.4.3-2.5-.4-2.8-1.7C5.8 17.5 7 13.5 11 20z" /><path d="M2 21c3.5-3 6-5.5 11.5-6" />
-  </svg>
-);
-const Droplet = ({ size = 24, className = '' }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
-  </svg>
-);
-const Snowflake = ({ size = 24, className = '' }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <line x1="2" x2="22" y1="12" y2="12" /><line x1="12" x2="12" y1="2" y2="22" /><path d="m20 16-8-4-8 4" /><path d="m4 8 8 4 8-4" /><path d="m16 4-4 8-4-8" /><path d="m8 20 4-8 4 8" />
-  </svg>
-);
-const Sun = ({ size = 24, className = '' }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <circle cx="12" cy="12" r="4" /><path d="M12 2v2" /><path d="M12 20v2" /><path d="M22 12h-2" /><path d="M4 12H2" /><path d="M18.36 5.64l-1.48 1.48" /><path d="M6.07 17.93l-1.48 1.48" /><path d="M17.93 17.93l1.48 1.48" /><path d="M5.64 5.64l1.48 1.48" />
-  </svg>
-);
-const Flame = ({ size = 24, className = '' }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.24.7-2.65 1.7-3.66 1.48-1.6 4.5-1.9 4.5-1.9H12s-3.5 1.5-3.5 3c0 1.25.9 2.5 2 3.5.5.5 1 1.2 1.5 2-.45.92-1.4 1.5-2.5 1.5z" /><path d="M22 21.5-14-14" />
-  </svg>
-);
-const MessageSquare = ({ size = 24, className = '' }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-  </svg>
-);
-const AlertTriangle = ({ size = 24, className = '' }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" /><line x1="12" x2="12" y1="9" y2="13" /><line x1="12" x2="12.01" y1="17" y2="17" />
-  </svg>
-);
-const Zap = ({ size = 24, className = '' }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-  </svg>
-);
-const CloudOff = ({ size = 24, className = '' }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <path d="M22.61 10.21A5 5 0 0 0 18 6H9a5 5 0 0 0-3.8-1.58M3 3l18 18" /><path d="M7.5 17.16a5 5 0 0 0 6.64-6.32" />
-  </svg>
-);
-const Loader2 = ({ size = 24, className = '' }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-  </svg>
-);
-// --- END INLINE SVG ICONS ---
-
 
 // --- CONFIGURATION ---
 const PLACES = [
@@ -300,13 +254,17 @@ const TimelinePoint = ({ year, index, activeIndex, onSelect }) => (
     <button 
       onClick={() => onSelect(index)}
       className={`
-        w-5 h-5 rounded-full border-2 transition-all duration-300 mb-1 focus:outline-none
-        ${index <= activeIndex ? 'bg-green-500 border-green-700' : 'bg-white border-gray-400'}
-        ${activeIndex === index ? 'ring-4 ring-green-300 scale-125' : 'hover:scale-110'}
+        w-6 h-6 rounded-full border-4 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-offset-2
+        ${index <= activeIndex 
+          ? 'bg-green-600 border-green-800 focus:ring-green-400' 
+          : 'bg-white border-gray-300 hover:border-green-400 focus:ring-gray-300'}
+        ${activeIndex === index ? 'scale-125 shadow-lg' : 'hover:scale-110'}
       `}
       aria-label={`Select year +${year}`}
     />
-    <span className={`text-xs mt-1 ${activeIndex === index ? 'font-bold text-green-700' : 'text-gray-500'}`}>
+    <span className={`text-sm mt-3 whitespace-nowrap transition-colors duration-300
+      ${activeIndex === index ? 'font-extrabold text-green-700' : 'text-gray-600 font-medium'}
+    `}>
       +{year}
     </span>
   </div>
@@ -316,14 +274,20 @@ const PlaceCard = ({ place, selectedId, onSelect }) => (
   <button
     onClick={() => onSelect(place.id)}
     className={`
-      flex flex-col items-center p-3 rounded-xl transition-all duration-300 shadow-lg min-w-[120px] mx-1 focus:outline-none
-      ${selectedId === place.id ? 'bg-green-50 border-2 border-green-500 shadow-green-200' : 'bg-white border border-gray-200 hover:bg-gray-50'}
+      flex flex-col items-center p-3 rounded-xl transition-all duration-300 shadow-md min-w-[140px] mx-1.5 md:mx-2 focus:outline-none
+      ${selectedId === place.id 
+        ? 'bg-green-600 border-2 border-green-800 shadow-xl shadow-green-300/50 transform scale-[1.02]' 
+        : 'bg-white border border-gray-200 hover:bg-gray-50 hover:shadow-lg'}
     `}
   >
-    <div className={`p-2 rounded-full mb-2 ${selectedId === place.id ? 'bg-green-500' : 'bg-gray-100'}`}>
-      <place.Icon size={24} className={selectedId === place.id ? 'text-white' : place.color} />
+    <div className={`p-2 rounded-full mb-2 transition-colors duration-300
+      ${selectedId === place.id ? 'bg-white' : 'bg-gray-100'}
+    `}>
+      <place.Icon size={24} className={selectedId === place.id ? 'text-green-600' : place.color} />
     </div>
-    <span className={`text-sm font-semibold text-center ${selectedId === place.id ? 'text-green-800' : 'text-gray-700'}`}>
+    <span className={`text-sm font-semibold text-center leading-tight transition-colors duration-300
+      ${selectedId === place.id ? 'text-white' : 'text-gray-800'}
+    `}>
       {place.name}
     </span>
   </button>
@@ -345,26 +309,30 @@ const HotspotBubble = ({ bubble, index, activeBubble, setActiveBubble }) => {
       <button
         onClick={() => setActiveBubble(isActive ? null : index)}
         className={`
-          relative w-6 h-6 rounded-full border-2 transition-all duration-300 flex items-center justify-center 
-          ${isActive ? 'bg-red-500 border-red-700 scale-125 shadow-xl' : 'bg-white/50 border-red-500 hover:scale-110'}
-          focus:outline-none focus:ring-2 focus:ring-red-400
+          relative w-7 h-7 rounded-full border-3 transition-all duration-300 flex items-center justify-center 
+          ${isActive 
+            ? 'bg-red-600 border-red-800 scale-125 shadow-xl ring-4 ring-red-300 animate-pulse' 
+            : 'bg-white/70 border-red-500 hover:scale-110 hover:bg-white'}
+          focus:outline-none
         `}
       >
-        <bubble.Icon size={14} className={isActive ? 'text-white' : 'text-red-500'} />
+        <bubble.Icon size={16} className={isActive ? 'text-white' : 'text-red-600'} />
       </button>
 
       {/* Tooltip */}
       {isActive && (
         <div 
-          className="absolute p-3 rounded-lg bg-gray-900 text-white shadow-2xl min-w-[220px] max-w-xs z-30 opacity-95 transition-opacity duration-300"
+          className="absolute p-4 rounded-xl bg-gray-900 text-white shadow-2xl min-w-[250px] max-w-xs z-30 opacity-95 transition-opacity duration-300 border-t-4 border-red-500"
           style={{
             transform: `translate(${bubble.x > 50 ? '-100% -50%' : '20px -50%'})`,
             [bubble.x > 50 ? 'right' : 'left']: bubble.x > 50 ? '10px' : '0px',
             top: '50%',
           }}
         >
-          <p className="font-bold text-sm mb-1 text-red-300">{bubble.title}</p>
-          <p className="text-xs">{bubble.text}</p>
+          <p className="font-bold text-base mb-1 text-red-300 flex items-center">
+            <Zap size={16} className="mr-1" />{bubble.title}
+          </p>
+          <p className="text-sm">{bubble.text}</p>
         </div>
       )}
     </div>
@@ -385,9 +353,9 @@ export default function App() {
   const currentPrompt = IMAGE_PROMPTS[selectedPlaceId][currentYear];
   const currentImage = generatedImages[scenarioKey];
 
-  // Function to handle image generation with exponential backoff (No change)
+  // Function to handle image generation with exponential backoff
   const generateImage = useCallback(async (prompt, key) => {
-    if (generatedImages[key]) return; // Already cached
+    if (generatedImages[key] && generatedImages[key] !== 'error') return; // Already cached
     
     setIsLoadingImage(true);
     let attempts = 0;
@@ -440,14 +408,14 @@ export default function App() {
     }
   }, [generatedImages]);
 
-  // Effect to trigger image generation when scenario changes and image is not cached (No change)
+  // Effect to trigger image generation when scenario changes and image is not cached
   useEffect(() => {
     if (!generatedImages[scenarioKey] || generatedImages[scenarioKey] === 'error') {
       generateImage(currentPrompt, scenarioKey);
     }
   }, [scenarioKey, currentPrompt, generateImage, generatedImages]);
 
-  // Reset active bubble when place or year changes (No change)
+  // Reset active bubble when place or year changes
   useEffect(() => {
     setActiveBubble(null);
   }, [selectedPlaceId, yearIndex]);
@@ -460,22 +428,26 @@ export default function App() {
     setYearIndex(index);
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
-      
-      {/* Header */}
-      <header className="bg-white rounded-xl shadow-lg p-6 mb-8 border-b-4 border-green-500">
-        <h1 className="text-3xl font-extrabold text-gray-800">Future World Simulator</h1>
-        <p className="text-lg text-gray-500 mt-1">Visualize climate impact based on current scientific trajectories for key global regions.</p>
-      </header>
+  const currentPlaceName = PLACES.find(p => p.id === selectedPlaceId)?.name || 'Region';
 
-      {/* Main Content Area */}
-      <div className="max-w-4xl mx-auto">
+  return (
+    <div className="min-h-screen bg-gray-100 p-4 md:p-8 font-inter">
+      
+      {/* Container for content - better centering and maximum width */}
+      <div className="max-w-6xl mx-auto">
         
+        {/* Header - Enhanced */}
+        <header className="bg-white rounded-3xl shadow-2xl p-6 md:p-8 mb-8 border-t-8 border-green-600">
+          <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">Future World Simulator</h1>
+          <p className="text-lg text-gray-500 mt-2 font-medium">Visualize climate impact based on current scientific trajectories for key global regions.</p>
+        </header>
+
         {/* 1. TOP SLIDER: Places */}
-        <div className="mb-8">
-          <h2 className="text-sm font-semibold uppercase text-gray-500 mb-3 tracking-wider ml-1">Select a Region</h2>
-          <div className="flex overflow-x-auto pb-3 -mx-4 px-4 scrollbar-hide">
+        <div className="mb-10 p-4 bg-white rounded-xl shadow-lg">
+          <h2 className="text-lg font-bold uppercase text-gray-700 mb-4 tracking-wider border-b pb-2">
+            Select a Region
+          </h2>
+          <div className="flex overflow-x-auto pb-3 -mx-2 px-2 space-x-3 md:space-x-5 scrollbar-hide">
             {PLACES.map((place) => (
               <PlaceCard 
                 key={place.id}
@@ -489,28 +461,28 @@ export default function App() {
 
         {/* Current State Indicator */}
         <div className="text-center mb-6">
-          <p className="text-xl font-bold text-gray-700">
-            {PLACES.find(p => p.id === selectedPlaceId)?.name}: <span className="text-green-600">+{currentYear} Years</span>
-          </p>
+          <h2 className="text-3xl font-extrabold text-gray-800 p-3 bg-white/70 rounded-lg inline-block shadow-inner border border-gray-200">
+            <span className="text-red-600">{currentPlaceName}</span>: Projection <span className="text-green-600">+{currentYear} Years</span>
+          </h2>
         </div>
 
         {/* 2. MIDDLE: Image & Bubbles */}
-        <div className="relative w-full aspect-video rounded-xl shadow-2xl overflow-hidden bg-gray-200 mb-6">
+        <div className="relative w-full aspect-video rounded-2xl shadow-2xl overflow-hidden bg-gray-300 mb-8 border-4 border-gray-400">
           
           {isLoadingImage ? (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-100 z-10">
-              <Loader2 className="animate-spin text-green-500" size={48} />
-              <p className="mt-4 text-gray-600 font-semibold">Generating Scenario Image...</p>
-              <p className="text-sm text-gray-500 max-w-xs text-center mt-2">
-                Creating the unique visual projection for +{currentYear} years in {PLACES.find(p => p.id === selectedPlaceId)?.name}.
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-900/90 text-white z-10 p-4">
+              <Loader2 className="animate-spin text-green-400" size={64} />
+              <p className="mt-6 text-2xl font-semibold">Generating Visual Projection...</p>
+              <p className="text-base text-gray-300 max-w-sm text-center mt-2">
+                Creating the unique, realistic scenario for {currentPlaceName} in {currentYear} years. This may take a moment.
               </p>
             </div>
           ) : currentImage === 'error' ? (
-             <div className="absolute inset-0 flex flex-col items-center justify-center bg-red-100 z-10 p-4">
-              <AlertTriangle className="text-red-500" size={32} />
-              <p className="mt-4 text-red-700 font-semibold">Image Generation Failed</p>
-              <p className="text-sm text-red-500 max-w-xs text-center mt-2">
-                Could not load the projection. Please try switching scenarios and try again.
+             <div className="absolute inset-0 flex flex-col items-center justify-center bg-red-800/90 z-10 p-4">
+              <AlertTriangle className="text-white" size={40} />
+              <p className="mt-4 text-white font-bold text-xl">Image Generation Failed</p>
+              <p className="text-base text-red-200 max-w-md text-center mt-2">
+                Could not load the visual projection. Please check your API key setup or try switching scenarios and try again later.
               </p>
             </div>
           ) : currentImage ? (
@@ -530,19 +502,22 @@ export default function App() {
                   setActiveBubble={setActiveBubble}
                 />
               ))}
-              <p className="absolute bottom-2 right-2 bg-gray-900/70 text-white text-xs p-1 px-2 rounded-lg z-10">
-                Tap the red circles for local change details.
-              </p>
+              <div className="absolute top-4 right-4 bg-gray-900/70 text-white text-sm p-2 px-3 rounded-lg z-10 font-medium flex items-center shadow-lg">
+                 <Zap size={16} className="text-yellow-300 mr-2" />
+                 Tap the red indicators for Impact Hotspots.
+              </div>
             </>
           ) : null}
         </div>
 
         {/* 3. BOTTOM SLIDER: Years (Stepped Timeline) */}
-        <div className="p-6 bg-white rounded-xl shadow-md mb-8">
-          <h2 className="text-sm font-semibold uppercase text-gray-500 mb-5 tracking-wider">Timeline (Projection)</h2>
+        <div className="p-8 bg-white rounded-xl shadow-2xl mb-8 border-b-4 border-gray-300">
+          <h2 className="text-lg font-bold uppercase text-gray-700 mb-6 tracking-wider">
+            Projection Timeline
+          </h2>
           <div className="relative flex justify-between items-center px-4">
             {/* Timeline Track Line */}
-            <div className="absolute top-1/2 left-0 right-0 h-1 bg-gray-200 mx-4 -translate-y-1/2 z-0">
+            <div className="absolute top-[27px] left-0 right-0 h-1 bg-gray-200 mx-4 -translate-y-1/2 z-0">
                 {/* Active Progress Line */}
                 <div 
                     className="h-full bg-green-500 transition-all duration-300 rounded-full" 
@@ -563,12 +538,12 @@ export default function App() {
         </div>
 
         {/* 4. EXPLANATION TEXT */}
-        <div className="p-6 bg-white rounded-xl shadow-lg border-l-4 border-red-500">
-          <h3 className="text-xl font-bold text-gray-800 mb-3 flex items-center">
-            <MessageSquare size={20} className="mr-2 text-red-500" />
+        <div className="p-8 bg-white rounded-xl shadow-2xl border-l-8 border-red-500">
+          <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+            <MessageSquare size={24} className="mr-2 text-red-500" />
             Detailed Scientific Explanation
           </h3>
-          <p className="text-gray-600 leading-relaxed">
+          <p className="text-gray-700 leading-relaxed text-lg">
             {currentScenario.description}
           </p>
         </div>
