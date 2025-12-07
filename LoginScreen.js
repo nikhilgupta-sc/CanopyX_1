@@ -204,6 +204,7 @@ const styles = StyleSheet.create({
   socialButtonsContainer: {
     width: '100%',
     marginBottom: 24,
+    fontFamily: 'Quicksand-Medium'
   },
   divider: {
     flexDirection: 'row',

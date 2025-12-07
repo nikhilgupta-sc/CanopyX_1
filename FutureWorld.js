@@ -26,7 +26,8 @@ const PLACES = [
 
 const YEARS = [5, 10, 25, 50, 100];
 const API_KEY = "AIzaSyBz3TMrqBB3g3odwi8Folb5neDiuGlalTo"; // 🛑 UPDATE THIS WITH YOUR KEY
-const IMAGE_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=" + API_KEY;
+const IMAGE_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent?key=AIzaSyBz3TMrqBB3g3odwi8Folb5neDiuGlalTo";
+
 
 // Detailed image generation prompts for all 25 scenarios (COPIED FROM YOUR FILE)
 const IMAGE_PROMPTS = {
@@ -421,69 +422,84 @@ export default function FutureWorld() {
   }
 
   // Function to handle image generation with exponential backoff
-  const generateImage = useCallback(async (prompt, key) => {
-    if (!isCacheLoaded) return; 
-    if (generatedImages[key] && generatedImages[key] !== 'error') return; 
-    
-    setIsLoadingImage(true);
-    let attempts = 0;
-    const maxAttempts = 5;
+ const generateImage = useCallback(async (prompt, key) => {
+  if (!isCacheLoaded) return;
+  if (generatedImages[key] && generatedImages[key] !== "error") return;
 
-    while (attempts < maxAttempts) {
-      try {
-        const payload = { 
-          instances: [{ prompt: prompt }], 
-          parameters: { "sampleCount": 1, "aspectRatio": "16:9" } 
-        };
-        
-        const response = await fetch(IMAGE_API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+  setIsLoadingImage(true);
+  let attempts = 0;
+  const maxAttempts = 5;
+
+  while (attempts < maxAttempts) {
+    try {
+      const payload = {
+        contents: [
+          {
+            role: "user",
+            parts: [
+              { text: prompt }
+            ]
+          }
+        ],
+        generationConfig: {
+          responseModalities: ["IMAGE"],
+          aspectRatio: "16:9",
+          sampleCount: 1
+        }
+      };
+
+      const response = await fetch(IMAGE_API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key":API_KEY
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error(`API returned status ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      const base64Data =
+        result?.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+
+      if (base64Data) {
+        const imageURL = `data:image/png;base64,${base64Data}`;
+
+        setGeneratedImages((prev) => {
+          const newCache = { ...prev, [key]: imageURL };
+          saveCache(newCache);
+          return newCache;
         });
 
-        if (!response.ok) {
-          throw new Error(`API returned status ${response.status}`);
-        }
-
-        const result = await response.json();
-        
-        if (result.predictions && result.predictions.length > 0 && result.predictions[0].bytesBase64Encoded) {
-          const base64Data = result.predictions[0].bytesBase64Encoded;
-          const imageURL = `data:image/png;base64,${base64Data}`;
-
-          setGeneratedImages(prev => {
-            const newCache = { ...prev, [key]: imageURL };
-            saveCache(newCache); 
-            return newCache;
-          });
-          
-          setIsLoadingImage(false);
-          return; 
-        } else {
-          throw new Error("Image generation failed or returned empty result.");
-        }
-
-      } catch (error) {
-        console.error(`Attempt ${attempts + 1} failed for ${key}:`, error);
-        attempts++;
-        if (attempts >= maxAttempts) {
-          setGeneratedImages(prev => {
-            const newCache = { ...prev, [key]: 'error' };
-            saveCache(newCache); 
-            return newCache;
-          });
-          setIsLoadingImage(false);
-          return; 
-        }
-        const delay = Math.pow(2, attempts) * 1000 + Math.random() * 1000;
-        await new Promise(resolve => setTimeout(resolve, delay));
+        setIsLoadingImage(false);
+        return; // success
+      } else {
+        throw new Error("Image generation returned empty result.");
       }
+    } catch (error) {
+      console.error(`Attempt ${attempts + 1} failed for ${key}:`, error);
+      attempts++;
+
+      if (attempts >= maxAttempts) {
+        setGeneratedImages((prev) => {
+          const newCache = { ...prev, [key]: "error" };
+          saveCache(newCache);
+          return newCache;
+        });
+        setIsLoadingImage(false);
+        return;
+      }
+
+      const delay = Math.pow(2, attempts) * 1000 + Math.random() * 1000;
+      await new Promise((resolve) => setTimeout(resolve, delay));
     }
-  }, [generatedImages, isCacheLoaded]);
-
-
-  // useEffect to trigger image generation whenever the scenario changes
+  }
+}, [generatedImages, isCacheLoaded]);
+ // useEffect to trigger image generation whenever the scenario changes
   useEffect(() => {
     if (!isCacheLoaded) return; 
     const key = `${selectedPlaceId}_${currentYear}`;
@@ -633,7 +649,7 @@ export default function FutureWorld() {
             </View>
             <View style={styles.footerNote}>
               <Text style={styles.footerNoteText}>
-                Visualization powered by Imagen 4.0 API. Scenarios are based on projected high-emission climate pathways.
+                Visualization powered by Imagen 2.0 Flash API. Scenarios are based on projected high-emission climate pathways.
               </Text>
             </View>
           </View>
