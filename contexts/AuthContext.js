@@ -6,12 +6,14 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   updateProfile,
+  GoogleAuthProvider,
+  signInWithCredential
 } from 'firebase/auth';
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
-import { ResponseType } from 'expo-auth-session';
+import * as AuthSession from 'expo-auth-session';
 
-
+// Required to complete the flow back to the app from the browser
 WebBrowser.maybeCompleteAuthSession();
 
 const AuthContext = createContext();
@@ -29,110 +31,73 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState(null);
 
-  
-  const [request, response, promptAsync] = Google.useAuthRequest({
-    expoClientId: '818108344816-63utcga7gjsigao0hkj41f0ifhuhbc2n.apps.googleusercontent.com', // From Google Cloud Console
-    iosClientId: 'YOUR_IOS_CLIENT_ID',   // For iOS
-    androidClientId: '818108344816-rskmmeu64fthdc23a8ehg816ei17bvgg.apps.googleusercontent.com', // For Android
-    webClientId: '818108344816-jh1k9rukdn2j24n079fkq3jhjsphgf5q.apps.googleusercontent.com',   // For web
-    responseType: ResponseType.IdToken,
+  // 1. GENERATE REDIRECT URI
+  // This tells Google where to send the user back (canopyx://)
+  const redirectUri = AuthSession.makeRedirectUri({
+    scheme: 'canopyx',
   });
 
-  
-  useEffect(() => {
-    console.log('Setting up auth state listener...');
-    
-    const unsubscribe = onAuthStateChanged(auth, 
-      (user) => {
-        console.log('Auth state changed:', user);
-        setUser(user);
-        setLoading(false);
-        setAuthError(null);
-      },
-      (error) => {
-        console.error('Auth state error:', error);
-        setAuthError(error);
-        setLoading(false);
-      }
-    );
+  // 2. GOOGLE AUTH REQUEST
+  // We pass the redirectUri here so the hook matches the Google Console settings
+  const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
+    androidClientId: '818108344816-rskmmeu64fthdc23a8ehg816ei17bvgg.apps.googleusercontent.com',
+    webClientId: '818108344816-oq16e4bib2lsn3g4msc9vvndn6fk59hl.apps.googleusercontent.com',
+    redirectUri, 
+  });
 
+  // 3. LISTEN FOR FIREBASE AUTH STATE
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser);
+      setLoading(false);
+    });
     return unsubscribe;
   }, []);
 
- 
+  // 4. HANDLE GOOGLE RESPONSE
   useEffect(() => {
     if (response?.type === 'success') {
       const { id_token } = response.params;
       handleGoogleSignIn(id_token);
+    } else if (response?.type === 'error' || response?.type === 'cancel') {
+      console.log("Google Auth Status:", response.type, response?.error);
     }
   }, [response]);
 
   const handleGoogleSignIn = async (idToken) => {
     try {
-     
-      
-      console.log('Google sign in successful with token:', idToken);
-      
-      
-      const tempUser = {
-        uid: 'google-user-' + Date.now(),
-        displayName: 'Google User',
-        email: 'user@google.com',
-        photoURL: null,
-        providerId: 'google.com'
-      };
-      setUser(tempUser);
-      
+      setLoading(true);
+      const credential = GoogleAuthProvider.credential(idToken);
+      await signInWithCredential(auth, credential);
+      setAuthError(null);
     } catch (error) {
-      console.error('Google token sign in error:', error);
-      setAuthError(error);
+      console.error('Firebase Google Auth Error:', error);
+      setAuthError(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   const signInWithGoogle = async () => {
     try {
-      console.log('Starting Google sign in...');
-      
-     
-      if (typeof window !== 'undefined' && window.document) {
-        const { GoogleAuthProvider, signInWithPopup } = await import('firebase/auth');
-        const provider = new GoogleAuthProvider();
-        const result = await signInWithPopup(auth, provider);
-        console.log('Web Google sign in successful:', result.user);
-        return result;
-      } 
-     
-      else {
-        await promptAsync();
-      }
+      setAuthError(null);
+      // promptAsync triggers the system browser
+      await promptAsync(); 
     } catch (error) {
-      console.error('Google Sign In Error:', error);
-      console.error('Error code:', error.code);
-      console.error('Error message:', error.message);
-      setAuthError(error);
-      throw error;
+      console.error("Sign-in trigger error:", error);
+      setAuthError(error.message);
     }
   };
 
-  const signInWithApple = async () => {
-    try {
-      console.log('Apple sign in - not available on Android');
-      throw new Error('Apple Sign-In is only available on iOS devices. Please use Google Sign-In or email login.');
-    } catch (error) {
-      console.error('Apple Sign In Error:', error);
-      setAuthError(error);
-      throw error;
-    }
-  };
-
+  // --- EMAIL & PASSWORD FUNCTIONS ---
   const signInWithEmail = async (email, password) => {
     try {
       setLoading(true);
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      return userCredential;
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      setAuthError(null);
+      return result;
     } catch (error) {
-      console.error('Email sign in error:', error);
-      setAuthError(error);
+      setAuthError(error.message);
       throw error;
     } finally {
       setLoading(false);
@@ -144,14 +109,12 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       if (name) {
-        await updateProfile(userCredential.user, {
-          displayName: name
-        });
+        await updateProfile(userCredential.user, { displayName: name });
       }
+      setAuthError(null);
       return userCredential;
     } catch (error) {
-      console.error('Email sign up error:', error);
-      setAuthError(error);
+      setAuthError(error.message);
       throw error;
     } finally {
       setLoading(false);
@@ -162,9 +125,7 @@ export const AuthProvider = ({ children }) => {
     try {
       await signOut(auth);
     } catch (error) {
-      console.error('Sign Out Error:', error);
-      setAuthError(error);
-      throw error;
+      setAuthError(error.message);
     }
   };
 
@@ -175,14 +136,12 @@ export const AuthProvider = ({ children }) => {
     signInWithEmail,
     signUpWithEmail,
     signInWithGoogle,
-    signInWithApple,
     signOut: signOutUser
   };
 
   return (
     <AuthContext.Provider value={value}>
-      {children}
+      {!loading && children}
     </AuthContext.Provider>
   );
 };
-

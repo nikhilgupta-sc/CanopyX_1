@@ -13,11 +13,13 @@ export default function ClimateChangeScreen() {
      
         <TopTab.Navigator
           screenOptions={{
+            tabBarLabelStyle: { fontFamily: 'Quicksand-Bold', textTransform: 'none', fontSize: 16 },
             tabBarActiveTintColor: '#4CAF50',
             tabBarInactiveTintColor: '#666666',
             tabBarIndicatorStyle: { backgroundColor: '#4CAF50' },
             tabBarStyle: { backgroundColor: '#FFFFFF' },
             tabBarLabelStyle: { fontWeight: '600' },
+            fontFamily:'Quicksand-Bold',
           }}
         >
           <TopTab.Screen name="Articles" component={ArticlesTab} />

@@ -126,6 +126,7 @@ export default function SurveyScreen({ navigation }) {
     const value = responses[q.id] ?? q.min;
 
     return (
+     <ScrollView> 
       <View key={q.id} style={styles.card}>
         <Text style={styles.qText}>{q.text}</Text>
 
@@ -151,11 +152,13 @@ export default function SurveyScreen({ navigation }) {
           />
         )}
       </View>
+    </ScrollView>
     );
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+   <ScrollView>
+   <SafeAreaView style={styles.container}>
       {/* header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={handleClose}>
@@ -190,6 +193,7 @@ export default function SurveyScreen({ navigation }) {
         <View style={{ height: 40 }} />
       </ScrollView>
     </SafeAreaView>
+   </ScrollView> 
   );
 }
 

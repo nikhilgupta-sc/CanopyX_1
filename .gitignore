@@ -35,3 +35,13 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+# Firebase Secrets
+service-account.json
+
+#Firebase & Secrets
+.env
+.env.local
+.env.development.local
+google-services.json
+GoolgeService-Info.plist

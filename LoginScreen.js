@@ -32,7 +32,10 @@ export default function LoginScreen({ navigation }) {
       Alert.alert('Error', 'Please fill in all fields');
       return;
     }
-
+  const handleLogin = async () => {
+  await signIn(email, password);
+  await syncCloudToLocal(); // Pull their cloud data down
+};
     setIsLoading(true);
     
     try {

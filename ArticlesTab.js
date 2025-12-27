@@ -1,79 +1,87 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  SafeAreaView
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, SafeAreaView } from 'react-native';
 
-const articles = [
+const ARTICLES = [
   {
-    id: 1,
+    id: '1',
+    firestoreId: 'How_Does_Climate_Change_Happen', // The ID you used in Google Docs script
     title: 'How Climate Change Happens',
-    summary: 'Learn about greenhouse effect and human impact.',
-    content: `Climate change happens when extra greenhouse gases trap heat.\n\nGreenhouse gases (CO₂, methane) let sunlight in but block heat from escaping.\n\nSince 1800s we burn fossil fuels, adding CO₂, making Earth warmer.`
+    description: 'Understand the science behind Climate Change.',
+    category: 'Science'
   },
   {
-    id: 2,
-    title: 'Impact of Climate Change',
-    summary: 'Effects on weather, oceans, and ecosystems.',
-    content: `Rising temperatures cause:\n• Stronger storms\n• More droughts\n• Sea level rise (melting ice)\n\nAnimals lose habitats, coral reefs bleach, and weather disasters become worse.`
+    id: '2',
+    firestoreId: 'What_Releases_Carbon_Dioxide', // The ID you used in Google Docs script
+    title: 'What Releases Greenhouse Gases?',
+    description: 'Understand the fundamental contributors to Greenhouse Gases.',
+    category: 'Science'
   },
   {
-    id: 3,
-    title: 'What Causes Climate Change',
-    summary: 'The main sources of greenhouse gas emissions.',
-    content: `Major causes:\n• Burning coal, oil, and gas (75%)\n• Agriculture and livestock (24%)\n• Deforestation\n\nFossil fuels release CO₂. Cows produce methane. Cutting trees reduces CO₂ absorption.`
+    id: '3',
+    firestoreId: 'Effects_Of_Climate_Change', // The ID you used in Google Docs script
+    title: 'Effects Of Climate Change',
+    description: 'Understand the effects of Climate Change.',
+    category: 'Science'
   },
   {
-    id: 4,
-    title: 'What You Can Do',
-    summary: 'Everyday actions to reduce your footprint.',
-    content: `Actions you can take:\n• Use LED bulbs and unplug devices\n• Take shorter showers\n• Walk, bike, or use public transit\n• Eat less meat\n• Recycle and compost\n\nSmall steps add up when millions participate!`
-  }
+    id: '4',
+    firestoreId: 'What_Can_You_Do_About_Climate_Change', // The ID you used in Google Docs script
+    title: 'What Can You Do About Climate Change',
+    description: 'Understand how you can solve Climate Change',
+    category: 'Impact'
+  },
+  // Add more articles here
 ];
 
-export default function ArticlesTab({ navigation }) {
+const ArticlesTab = ({ navigation }) => {
+  const renderItem = ({ item }) => (
+    <TouchableOpacity 
+      style={styles.card}
+      onPress={() => navigation.navigate('ArticleDetail', { docId: item.firestoreId, title: item.title })}
+    >
+     
+      <View style={styles.cardContent}>
+        <Text style={styles.category}>{item.category}</Text>
+        <Text style={styles.title}>{item.title}</Text>
+        <Text style={styles.description} numberOfLines={2}>{item.description}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {articles.map(a => (
-          <TouchableOpacity
-            key={a.id}
-            style={styles.card}
-            onPress={() => navigation.navigate('ArticleView', { article: a })}
-          >
-            <Text style={styles.title}>{a.title}</Text>
-            <Text style={styles.summary}>{a.summary}</Text>
-            <View style={styles.readMore}>
-              <Text style={styles.readMoreText}>Read More</Text>
-              <Ionicons name="arrow-forward" size={16} color="#4CAF50" />
-            </View>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+      <Text style={styles.headerTitle}>Explore Articles</Text>
+      <FlatList
+        data={ARTICLES}
+        renderItem={renderItem}
+        keyExtractor={item => item.id}
+        contentContainerStyle={styles.listContainer}
+      />
     </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F5F5F5' },
-  scrollContent: { padding: 20 },
+  container: { flex: 1, backgroundColor: '#F8F9FA' },
+  headerTitle: { fontSize: 28, fontWeight: '800', color: '#1B4332', padding: 20, marginBottom: -10, fontFamily: 'Quicksand-Bold' },
+  listContainer: { padding: 20 },
   card: {
     backgroundColor: '#FFF',
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 15,
+    borderRadius: 15,
+    marginBottom: 20,
+    overflow: 'hidden',
+    elevation: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    elevation: 3
+    shadowRadius: 8,
+  
   },
-  title: { fontSize: 18, fontWeight: '600', color: '#2E2E2E', marginBottom: 8 },
-  summary: { fontSize: 14, color: '#666', lineHeight: 20, marginBottom: 12 },
-  readMore: { flexDirection: 'row', alignItems: 'center' },
-  readMoreText: { color: '#4CAF50', fontWeight: '500', marginRight: 4 }
+  cardImage: { width: '100%', height: 160 },
+  cardContent: { padding: 15 },
+  category: { color: '#2D6A4F', fontWeight: 'bold', fontSize: 12, textTransform: 'uppercase', marginBottom: 5, fontFamily:'Quicksand-Medium' },
+  title: { fontSize: 18, fontWeight: '700', color: '#1B4332', marginBottom: 5, fontFamily: 'Quicksand-Bold' },
+  description: { fontSize: 14, color: '#666', lineHeight: 20, fontFamily: 'Quicksand-Medium' },
 });
+
+export default ArticlesTab;

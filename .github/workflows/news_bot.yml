@@ -1,0 +1,37 @@
+name: Climate News Bot
+
+# Run every Monday and Thursday at 9am UTC
+on:
+  schedule:
+    - cron: '0 9 * * 1,4'
+  # Also allow manual trigger from GitHub website for testing
+  workflow_dispatch:
+
+jobs:
+  update-news:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          pip install firebase-admin google-genai requests
+
+      - name: Run the Bot
+        env:
+          # You add these secrets in your GitHub Repo Settings -> Secrets
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
+          # We need to handle the Firebase Key carefully (see below)
+          FIREBASE_CREDENTIALS: ${{ secrets.FIREBASE_CREDENTIALS }}
+        run: |
+          # Create the credentials file from the secret
+          echo "$FIREBASE_CREDENTIALS" > service-account.json
+          # Run the script
+          python scripts/update_news.py

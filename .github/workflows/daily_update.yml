@@ -1,0 +1,22 @@
+name: Climate News Auto-Update
+on:
+  schedule:
+    - cron: '0 0 */3 * *' # Runs at midnight every 3 days
+  workflow_dispatch: # Allows you to run it manually from GitHub
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install firebase-admin google-genai requests
+      - name: Run script
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
+        run: python scripts/update_news.py

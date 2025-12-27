@@ -1,35 +1,46 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  ScrollView, 
-  Image, 
-  Pressable, 
-  Dimensions, 
-  ActivityIndicator, 
-  Platform 
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Image,
+  Pressable,
+  Dimensions,
+  ActivityIndicator,
+  Platform,
+  TextInput,
+  Modal,
+  TouchableOpacity
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Ionicons, Feather } from '@expo/vector-icons'; 
+import { Ionicons, Feather } from '@expo/vector-icons';
+
 
 // --- CONFIGURATION ---
-// Note: Icons are mapped to Ionicons/Feather for React Native compatibility
 const PLACES = [
-  // Mapping inline SVGs to Ionicons or Feather
-  { id: 'amazon', name: 'Amazon Rainforest', Icon: ({ size, color }) => <Ionicons name="leaf-outline" size={size} color={color} />, color: '#16A34A' }, // green-600
-  { id: 'gbr', name: 'Great Barrier Reef', Icon: ({ size, color }) => <Ionicons name="water-outline" size={size} color={color} />, color: '#06B6D4' }, // cyan-500
-  { id: 'arctic', name: 'Arctic Sea Ice', Icon: ({ size, color }) => <Ionicons name="snow-outline" size={size} color={color} />, color: '#38BDF8' }, // sky-400
-  { id: 'maldives', name: 'The Maldives', Icon: ({ size, color }) => <Ionicons name="sunny-outline" size={size} color={color} />, color: '#F59E0B' }, // yellow-500
-  { id: 'yosemite', name: 'Yosemite, CA', Icon: ({ size, color }) => <Ionicons name="flame-outline" size={size} color={color} />, color: '#EA580C' }, // orange-500
+  { id: 'amazon', name: 'Amazon Rainforest', Icon: ({ size, color }) => <Ionicons name="leaf-outline" size={size} color={color} />, color: '#16A34A', fontFamily:'Quicksand-Medium'},
+  { id: 'gbr', name: 'Great Barrier Reef', Icon: ({ size, color }) => <Ionicons name="water-outline" size={size} color={color} />, color: '#06B6D4', fontFamily:'Quicksand-Medium'}, 
+  { id: 'arctic', name: 'Arctic Sea Ice', Icon: ({ size, color }) => <Ionicons name="snow-outline" size={size} color={color} />, color: '#38BDF8', fontFamily:'Quicksand-Medium'},
+  { id: 'maldives', name: 'The Maldives', Icon: ({ size, color }) => <Ionicons name="sunny-outline" size={size} color={color} />, color: '#F59E0B', fontFamily:'Quicksand-Medium'},
+  { id: 'yosemite', name: 'Yosemite, CA', Icon: ({ size, color }) => <Ionicons name="flame-outline" size={size} color={color} />, color: '#EA580C', fontFamily:'Quicksand-Medium'},
 ];
 
+
 const YEARS = [5, 10, 25, 50, 100];
-const API_KEY = "AIzaSyBz3TMrqBB3g3odwi8Folb5neDiuGlalTo"; // 🛑 UPDATE THIS WITH YOUR KEY
-const IMAGE_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent?key=AIzaSyBz3TMrqBB3g3odwi8Folb5neDiuGlalTo";
 
 
-// Detailed image generation prompts for all 25 scenarios (COPIED FROM YOUR FILE)
+const HF_API_TOKEN = "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";
+
+
+
+
+const HF_MODEL = "black-forest-labs/FLUX.1-schnell";
+const HF_API_URL = "https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-schnell";
+
+
+
+
 const IMAGE_PROMPTS = {
   amazon: {
     5: "Cinematic, realistic photo of a fragmenting Amazon Rainforest edge. Show subtle signs of stress: slightly dry leaves, a new dirt road cutting into the dense jungle. Deep green and brown tones. Professional aesthetic.",
@@ -68,7 +79,9 @@ const IMAGE_PROMPTS = {
   },
 };
 
-// Scientific Explanations & Hotspot Data (COPIED AND MAPPED ICONS FROM YOUR FILE)
+
+
+
 const SCENARIOS = {
   amazon: {
     5: {
@@ -88,7 +101,7 @@ const SCENARIOS = {
       description: "The 'Tipping Point' is within sight. Global heating and local deforestation cause rainfall patterns to dramatically disrupt, leading to exceptionally long dry seasons. The rainforest is struggling to generate its own moisture, placing deep-rooted trees under extreme mortality risk. The threat of large-scale wildfires becomes constant.",
       bubbles: [
         { x: 20, y: 60, title: "Dry Riverbeds", text: "Small tributaries and streams begin to dry up seasonally due to the lack of forest transpiration and reduced rainfall.", Icon: ({ size, color }) => <Feather name="alert-triangle" size={size} color={color} /> },
-        { x: 70, y: 30, title: "Fire Scars", text: "Evidence of understory fires that have weakened tree root systems and degraded overall forest resilience.", Icon: ({ size, color }) => <Feather name="thermometer" size={size} color={color} /> }, // Mapped Flame to Thermometer
+        { x: 70, y: 30, title: "Fire Scars", text: "Evidence of understory fires that have weakened tree root systems and degraded overall forest resilience.", Icon: ({ size, color }) => <Feather name="thermometer" size={size} color={color} /> },
       ],
     },
     50: {
@@ -219,7 +232,7 @@ const SCENARIOS = {
     10: {
       description: "Mega-fire impact becomes the defining ecological event. Scars from massive, high-intensity fires leave entire valleys charred. Smoke fills the valley floor for weeks every summer, causing public health alerts and forcing extended park closures during peak season.",
       bubbles: [
-        { x: 50, y: 50, title: "Charred Trunks", text: "Blackened tree skeletons stand where dense, mixed-conifer forest once thrived.", Icon: ({ size, color }) => <Feather name="thermometer" size={size} color={color} /> }, // Mapped Flame to Thermometer
+        { x: 50, y: 50, title: "Charred Trunks", text: "Blackened tree skeletons stand where dense, mixed-conifer forest once thrived.", Icon: ({ size, color }) => <Feather name="thermometer" size={size} color={color} /> },
         { x: 70, y: 20, title: "Dusty Air", text: "Haze and smoke reduce visibility, obscuring famous landmarks like El Capitan.", Icon: ({ size, color }) => <Feather name="cloud-off" size={size} color={color} /> },
       ],
     },
@@ -246,8 +259,10 @@ const SCENARIOS = {
   },
 };
 
-// --- ASYNC STORAGE HELPER FUNCTIONS (REPLACED LOCALSTORAGE) ---
+
+// --- ASYNC STORAGE HELPER FUNCTIONS ---
 const LOCAL_STORAGE_KEY = 'futureWorldImagesCache';
+
 
 const loadCache = async () => {
   try {
@@ -262,6 +277,7 @@ const loadCache = async () => {
   }
 };
 
+
 const saveCache = async (state) => {
   try {
     const serializedState = JSON.stringify(state);
@@ -270,14 +286,15 @@ const saveCache = async (state) => {
     console.error("Could not save image cache to AsyncStorage", e);
   }
 };
-// --- END ASYNC STORAGE HELPER FUNCTIONS ---
 
 
 // --- REACT NATIVE COMPONENTS ---
 
+
 const TimelinePoint = ({ year, index, activeIndex, onSelect }) => {
   const isActive = index <= activeIndex;
   const isSelected = index === activeIndex;
+
 
   return (
     <View style={styles.timelinePointContainer}>
@@ -300,23 +317,25 @@ const TimelinePoint = ({ year, index, activeIndex, onSelect }) => {
   );
 };
 
+
 const PlaceCard = ({ place, selectedId, onSelect }) => {
   const isSelected = selectedId === place.id;
-  // Convert Tailwind color classes to hex/rgba for RN styles
   const colorMap = {
-      '#16A34A': { text: '#16A34A', bg: '#D1FAE5' }, // green-600
-      '#06B6D4': { text: '#06B6D4', bg: '#CCFBF1' }, // cyan-500
-      '#38BDF8': { text: '#38BDF8', bg: '#E0F2FE' }, // sky-400
-      '#F59E0B': { text: '#F59E0B', bg: '#FEF3C7' }, // yellow-500
-      '#EA580C': { text: '#EA580C', bg: '#FFEDD5' }, // orange-500
+    '#16A34A': { text: '#16A34A', bg: '#D1FAE5' },
+    '#06B6D4': { text: '#06B6D4', bg: '#CCFBF1' },
+    '#38BDF8': { text: '#38BDF8', bg: '#E0F2FE' },
+    '#F59E0B': { text: '#F59E0B', bg: '#FEF3C7' },
+    '#EA580C': { text: '#EA580C', bg: '#FFEDD5' },
   };
   const iconColor = isSelected ? '#FFFFFF' : colorMap[place.color].text;
-  const placeCardStyle = { 
+  
+  const placeCardStyle = {
     ...styles.placeCardBase,
-    backgroundColor: isSelected ? colorMap[place.color].text : '#FFFFFF', 
+    backgroundColor: isSelected ? colorMap[place.color].text : '#FFFFFF',
     borderColor: isSelected ? colorMap[place.color].text : '#E5E7EB',
   };
-  const iconWrapperStyle = { 
+  
+  const iconWrapperStyle = {
     ...styles.placeIconWrapper,
     backgroundColor: isSelected ? 'rgba(255,255,255,0.2)' : colorMap[place.color].bg,
   };
@@ -335,7 +354,8 @@ const PlaceCard = ({ place, selectedId, onSelect }) => {
       </View>
       <Text style={[
         styles.placeCardText,
-        { color: isSelected ? '#FFFFFF' : '#1F2937' }
+        // ADDED THIS LINE BELOW:
+        { color: isSelected ? '#FFFFFF' : '#1F2937', fontFamily: place.fontFamily } 
       ]}>
         {place.name}
       </Text>
@@ -345,12 +365,13 @@ const PlaceCard = ({ place, selectedId, onSelect }) => {
 
 const HotspotBubble = ({ bubble, index, activeBubble, setActiveBubble }) => {
   const isActive = activeBubble === index;
-  
+ 
   const style = {
     position: 'absolute',
     top: `${bubble.y}%`,
     left: `${bubble.x}%`,
   };
+
 
   return (
     <View style={style}>
@@ -366,9 +387,9 @@ const HotspotBubble = ({ bubble, index, activeBubble, setActiveBubble }) => {
         <Feather name="alert-circle" size={16} color={isActive ? '#FFFFFF' : '#EF4444'} />
       </Pressable>
 
-      {/* Tooltip */}
+
       {isActive && (
-        <View 
+        <View
           style={[
             styles.tooltipBase,
             bubble.x > 50 ? styles.tooltipRight : styles.tooltipLeft,
@@ -385,16 +406,138 @@ const HotspotBubble = ({ bubble, index, activeBubble, setActiveBubble }) => {
 };
 
 
+const SearchModal = ({ visible, onClose, onGenerate }) => {
+  const [searchPrompt, setSearchPrompt] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [recentSearches, setRecentSearches] = useState([]);
+
+
+  const handleGenerate = async () => {
+    if (searchPrompt.trim().length < 3) {
+      alert('Please enter a more detailed prompt (at least 3 characters)');
+      return;
+    }
+   
+    setIsLoading(true);
+    await onGenerate(searchPrompt.trim());
+   
+    // Save to recent searches
+    const updatedSearches = [searchPrompt.trim(), ...recentSearches.slice(0, 4)];
+    setRecentSearches(updatedSearches);
+   
+    setIsLoading(false);
+    setSearchPrompt('');
+    onClose();
+  };
+
+
+  const handleRecentSearch = (search) => {
+    setSearchPrompt(search);
+  };
+
+
+  return (
+    <Modal
+      visible={visible}
+      animationType="slide"
+      transparent={true}
+      onRequestClose={onClose}
+    >
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContent}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>Generate Custom Image</Text>
+            <Pressable onPress={onClose} style={styles.closeButton}>
+              <Feather name="x" size={24} color="#6B7280" />
+            </Pressable>
+          </View>
+         
+          <Text style={styles.modalSubtitle}>
+            Describe the climate change scenario you want to visualize
+          </Text>
+         
+          <TextInput
+            style={styles.searchInput}
+            placeholder="e.g., Flooded city streets in 2050, melting glaciers, drought-stricken farmland..."
+            placeholderTextColor="#9CA3AF"
+            value={searchPrompt}
+            onChangeText={setSearchPrompt}
+            multiline
+            numberOfLines={3}
+            textAlignVertical="top"
+          />
+         
+          {recentSearches.length > 0 && (
+            <View style={styles.recentSearches}>
+              <Text style={styles.recentTitle}>Recent Searches:</Text>
+              <View style={styles.recentList}>
+                {recentSearches.map((search, index) => (
+                  <Pressable
+                    key={index}
+                    style={styles.recentItem}
+                    onPress={() => handleRecentSearch(search)}
+                  >
+                    <Feather name="clock" size={14} color="#6B7280" />
+                    <Text style={styles.recentText} numberOfLines={1}>{search}</Text>
+                  </Pressable>
+                ))}
+              </View>
+            </View>
+          )}
+         
+          <View style={styles.modalButtons}>
+            <Pressable
+              style={styles.cancelButton}
+              onPress={onClose}
+              disabled={isLoading}
+            >
+              <Text style={styles.cancelButtonText}>Cancel</Text>
+            </Pressable>
+           
+            <Pressable
+              style={[
+                styles.generateButton,
+                isLoading && styles.generateButtonDisabled
+              ]}
+              onPress={handleGenerate}
+              disabled={isLoading || searchPrompt.trim().length < 3}
+            >
+              {isLoading ? (
+                <ActivityIndicator size="small" color="#FFFFFF" />
+              ) : (
+                <>
+                  <Feather name="image" size={18} color="#FFFFFF" />
+                  <Text style={styles.generateButtonText}>Generate Image</Text>
+                </>
+              )}
+            </Pressable>
+          </View>
+         
+          <Text style={styles.modalNote}>
+            Uses Hugging Face AI. Free but may have rate limits.
+          </Text>
+        </View>
+      </View>
+    </Modal>
+  );
+};
+
+
 // --- MAIN APP COMPONENT ---
+
 
 export default function FutureWorld() {
   const [selectedPlaceId, setSelectedPlaceId] = useState('amazon');
-  const [yearIndex, setYearIndex] = useState(0); 
+  const [yearIndex, setYearIndex] = useState(0);
   const [activeBubble, setActiveBubble] = useState(null);
-  
+  const [searchModalVisible, setSearchModalVisible] = useState(false);
+ 
   const [generatedImages, setGeneratedImages] = useState({});
   const [isCacheLoaded, setIsCacheLoaded] = useState(false);
   const [isLoadingImage, setIsLoadingImage] = useState(false);
+  const [customImage, setCustomImage] = useState(null);
+  const [customPrompt, setCustomPrompt] = useState('');
+
 
   // Load cache on mount
   useEffect(() => {
@@ -404,110 +547,153 @@ export default function FutureWorld() {
     });
   }, []);
 
+
   const currentYear = YEARS[yearIndex];
   const scenarioKey = `${selectedPlaceId}_${currentYear}`;
   const currentScenario = SCENARIOS[selectedPlaceId] ? SCENARIOS[selectedPlaceId][currentYear] : null;
   const currentPrompt = IMAGE_PROMPTS[selectedPlaceId] ? IMAGE_PROMPTS[selectedPlaceId][currentYear] : null;
-  const currentImage = generatedImages[scenarioKey];
-  
-  // Guard against missing scenario data
-  if (!currentScenario || !currentPrompt) {
-      console.error("Missing configuration data for current scenario:", selectedPlaceId, currentYear);
-      // Fallback to a basic loading screen if config is missing
-      return (
-          <View style={styles.loadingContainer}>
-              <Text>Configuration Error: Missing data for {selectedPlaceId} +{currentYear} years.</Text>
-          </View>
-      );
-  }
+  const currentImage = customImage || (generatedImages[scenarioKey] && generatedImages[scenarioKey] !== 'error' ? generatedImages[scenarioKey] : null);
+ 
+  // Function to generate image with Hugging Face API
+  const generateImage = useCallback(async (prompt, key, isCustom = false) => {
+    if (!isCacheLoaded) return;
+    if (!isCustom && generatedImages[key] && generatedImages[key] !== "error") return;
 
-  // Function to handle image generation with exponential backoff
- const generateImage = useCallback(async (prompt, key) => {
-  if (!isCacheLoaded) return;
-  if (generatedImages[key] && generatedImages[key] !== "error") return;
 
-  setIsLoadingImage(true);
-  let attempts = 0;
-  const maxAttempts = 5;
+    setIsLoadingImage(true);
 
-  while (attempts < maxAttempts) {
+
     try {
-      const payload = {
-        contents: [
-          {
-            role: "user",
-            parts: [
-              { text: prompt }
-            ]
-          }
-        ],
-        generationConfig: {
-          responseModalities: ["IMAGE"],
-          aspectRatio: "16:9",
-          sampleCount: 1
-        }
-      };
+   const payload = {
+  inputs: prompt,
+  parameters: {
+    negative_prompt: "blurry, cartoon, unrealistic, low quality...",
+    width: 1024,
+    height: 576
+  }
+};
 
-      const response = await fetch(IMAGE_API_URL, {
-        method: "POST",
+
+      const response = await fetch(HF_API_URL, {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key":API_KEY
+          'Authorization': `Bearer ${HF_API_TOKEN}`,
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
 
+
       if (!response.ok) {
-        throw new Error(`API returned status ${response.status}`);
+        const errorText = await response.text();
+       
+        // Handle rate limiting
+        if (response.status === 429) {
+          throw new Error('Rate limited. The model is loading. Please wait 10-20 seconds and try again.');
+        }
+       
+        if (response.status === 503) {
+          throw new Error('Model is loading. Please wait 20-30 seconds and try again.');
+        }
+       
+        throw new Error(`Hugging Face API error ${response.status}: ${errorText}`);
       }
 
-      const result = await response.json();
 
-      const base64Data =
-        result?.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-
-      if (base64Data) {
-        const imageURL = `data:image/png;base64,${base64Data}`;
-
-        setGeneratedImages((prev) => {
-          const newCache = { ...prev, [key]: imageURL };
-          saveCache(newCache);
-          return newCache;
-        });
-
+      // Hugging Face returns image bytes directly
+      const imageBlob = await response.blob();
+     
+      // Convert blob to base64 for storage
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64data = reader.result;
+       
+        if (isCustom) {
+          setCustomImage(base64data);
+          setCustomPrompt(prompt);
+        } else {
+          setGeneratedImages((prev) => {
+            const newCache = { ...prev, [key]: base64data };
+            saveCache(newCache);
+            return newCache;
+          });
+        }
+       
         setIsLoadingImage(false);
-        return; // success
-      } else {
-        throw new Error("Image generation returned empty result.");
-      }
+      };
+     
+      reader.readAsDataURL(imageBlob);
+     
     } catch (error) {
-      console.error(`Attempt ${attempts + 1} failed for ${key}:`, error);
-      attempts++;
-
-      if (attempts >= maxAttempts) {
+      console.error('Image generation failed:', error);
+     
+      // User-friendly error messages
+      if (error.message.includes('Rate limited') || error.message.includes('loading')) {
+        alert(`⚠️ ${error.message}\n\nHugging Face models are free but may need time to load.`);
+      } else if (error.message.includes('401') || error.message.includes('403')) {
+        alert('Invalid Hugging Face token. Please check your API token.');
+      } else {
+        alert('Image generation failed. Please try again in 30 seconds.');
+      }
+     
+      if (!isCustom) {
         setGeneratedImages((prev) => {
-          const newCache = { ...prev, [key]: "error" };
+          const newCache = { ...prev, [key]: 'error' };
           saveCache(newCache);
           return newCache;
         });
-        setIsLoadingImage(false);
-        return;
       }
-
-      const delay = Math.pow(2, attempts) * 1000 + Math.random() * 1000;
-      await new Promise((resolve) => setTimeout(resolve, delay));
+     
+      setIsLoadingImage(false);
     }
-  }
-}, [generatedImages, isCacheLoaded]);
- // useEffect to trigger image generation whenever the scenario changes
+  }, [generatedImages, isCacheLoaded]);
+
+
+  // Function to generate custom image from search
+  const handleCustomGenerate = async (prompt) => {
+    const customKey = `custom_${Date.now()}`;
+    await generateImage(prompt, customKey, true);
+  };
+
+
+  // Function to return to preset scenarios
+  const handleBackToPresets = () => {
+    setCustomImage(null);
+    setCustomPrompt('');
+  };
+
+
+  // Retry function for loading models
+  const retryGeneration = async () => {
+    const key = `${selectedPlaceId}_${currentYear}`;
+    const prompt = IMAGE_PROMPTS[selectedPlaceId][currentYear];
+    await generateImage(prompt, key, false);
+  };
+
+
+  // useEffect to trigger image generation whenever the scenario changes
   useEffect(() => {
-    if (!isCacheLoaded) return; 
+    if (!isCacheLoaded || customImage) return;
     const key = `${selectedPlaceId}_${currentYear}`;
     const prompt = IMAGE_PROMPTS[selectedPlaceId][currentYear];
 
-    setActiveBubble(null); 
-    generateImage(prompt, key);
-  }, [selectedPlaceId, yearIndex, currentYear, generateImage, isCacheLoaded]);
+
+    setActiveBubble(null);
+   
+    // Only generate if not already cached
+    if (!generatedImages[key] || generatedImages[key] === 'error') {
+      generateImage(prompt, key, false);
+    }
+  }, [selectedPlaceId, yearIndex, currentYear, generateImage, isCacheLoaded, generatedImages, customImage]);
+
+
+  if (!currentScenario || !currentPrompt) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text>Configuration Error: Missing data for {selectedPlaceId} +{currentYear} years.</Text>
+      </View>
+    );
+  }
 
 
   if (!isCacheLoaded) {
@@ -519,156 +705,259 @@ export default function FutureWorld() {
     );
   }
 
-  // Find the current place name for alt text
+
   const currentPlaceName = PLACES.find(p => p.id === selectedPlaceId)?.name || 'Ecosystem';
+
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <View style={styles.header}>
-        <Text style={styles.title}>Global Climate Futures</Text>
+        <Text style={styles.title}>The World Of The Future</Text>
         <Text style={styles.subtitle}>
           Visualize the impact of climate change on critical global hotspots over time.
         </Text>
+       
+        {/* Search Bar */}
+        <View style={styles.searchContainer}>
+          <Pressable
+            style={styles.searchButton}
+            onPress={() => setSearchModalVisible(true)}
+          >
+            <Feather name="search" size={20} color="#6B7280" />
+            <Text style={styles.searchButtonText}>Search for a custom climate scenario...</Text>
+          </Pressable>
+        </View>
       </View>
+
 
       {/* Place Selection */}
       <View style={styles.placeSelectionContainer}>
-        <Text style={styles.placeSelectionTitle}>Select a Critical Ecosystem:</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.placeCardWrapper}>
-          {PLACES.map(place => (
-            <PlaceCard 
-              key={place.id}
-              place={place}
-              selectedId={selectedPlaceId}
-              onSelect={id => {
-                setSelectedPlaceId(id);
-                setYearIndex(0); 
-              }}
-            />
-          ))}
-        </ScrollView>
+        <View style={styles.placeSelectionHeader}>
+          <Text style={styles.placeSelectionTitle}>Select a Critical Ecosystem:</Text>
+          {customImage && (
+            <Pressable style={styles.backButton} onPress={handleBackToPresets}>
+              <Feather name="arrow-left" size={16} color="#FFFFFF" />
+              <Text style={styles.backButtonText}>Back to Presets</Text>
+            </Pressable>
+          )}
+        </View>
+        {!customImage && (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.placeCardWrapper}>
+            {PLACES.map(place => (
+              <PlaceCard
+                key={place.id}
+                place={place}
+                selectedId={selectedPlaceId}
+                onSelect={id => {
+                  setSelectedPlaceId(id);
+                  setYearIndex(0);
+                }}
+              />
+            ))}
+          </ScrollView>
+        )}
       </View>
+
 
       {/* Main Content Area */}
       <View style={styles.mainContentArea}>
-        
-        {/* Timeline */}
-        <View style={styles.timelineArea}>
-          <View style={styles.timelineLine}>
-            <View 
-              style={[
-                styles.timelineProgress, 
-                { width: `${(yearIndex / (YEARS.length - 1)) * 100}%` }
-              ]} 
-            />
-          </View>
-          <View style={styles.timelinePointsWrapper}>
-            {YEARS.map((year, index) => (
-              <TimelinePoint
-                key={year}
-                year={year}
-                index={index}
-                activeIndex={yearIndex}
-                onSelect={setYearIndex}
+       
+        {/* Timeline - Only show for preset scenarios */}
+        {!customImage && (
+          <View style={styles.timelineArea}>
+            <View style={styles.timelineLine}>
+              <View
+                style={[
+                  styles.timelineProgress,
+                  { width: `${(yearIndex / (YEARS.length - 1)) * 100}%` }
+                ]}
               />
-            ))}
+            </View>
+            <View style={styles.timelinePointsWrapper}>
+              {YEARS.map((year, index) => (
+                <TimelinePoint
+                  key={year}
+                  year={year}
+                  index={index}
+                  activeIndex={yearIndex}
+                  onSelect={setYearIndex}
+                />
+              ))}
+            </View>
           </View>
-        </View>
-        
+        )}
+       
         {/* Scenario Header */}
         <View style={styles.scenarioHeader}>
-          <Text style={styles.scenarioTitle}>
-            <Feather name="alert-triangle" size={24} color="#EF4444" />
-            {' '}Scenario: 
-            <Text style={styles.scenarioYearText}> +{currentYear} Years</Text>
-          </Text>
-          <Text style={styles.scenarioSubtitle}>
-            Click on the red hotspots in the image below to learn more.
-          </Text>
+          {customImage ? (
+            <>
+              <Text style={styles.scenarioTitle}>
+                <Feather name="image" size={24} color="#10B981" />
+                {' '}Custom Scenario
+              </Text>
+              <Text style={styles.customPromptText} numberOfLines={2}>
+                "{customPrompt}"
+              </Text>
+            </>
+          ) : (
+            <>
+              <Text style={styles.scenarioTitle}>
+                <Feather name="alert-triangle" size={24} color="#EF4444" />
+                {' '}Scenario:
+                <Text style={styles.scenarioYearText}> +{currentYear} Years</Text>
+              </Text>
+              <Text style={styles.scenarioSubtitle}>
+                Click on the red hotspots in the image below to learn more.
+              </Text>
+            </>
+          )}
         </View>
+
 
         {/* Image and Description Layout */}
         <View style={styles.imageDescriptionLayout}>
-          
+         
           {/* Image/Visualization Area */}
           <View style={styles.imageVisualizationArea}>
             {isLoadingImage && (
               <View style={styles.imageOverlay}>
                 <ActivityIndicator size="large" color="#10B981" />
-                <Text style={styles.overlayText}>Generating future scenario visualization...</Text>
-                <Text style={styles.overlaySmallText}>AI generation in progress</Text>
+                <Text style={styles.overlayText}>
+                  {customImage ? 'Generating custom visualization...' : 'Generating future scenario visualization...'}
+                </Text>
+                <Text style={styles.overlaySmallText}>
+                  Using Hugging Face • This may take 20-40 seconds
+                  {HF_MODEL.includes('schnell') ? ' (Fast model)' : ''}
+                </Text>
               </View>
             )}
 
-            {currentImage === 'error' && !isLoadingImage && (
+
+            {!isLoadingImage && !currentImage && generatedImages[scenarioKey] === 'error' && (
               <View style={styles.imageErrorBox}>
                 <Feather name="alert-triangle" size={32} color="#B91C1C" />
-                <Text style={styles.errorTitle}>Image Generation Error</Text>
-                <Text style={styles.errorText}>Could not generate a visualization for this scenario.</Text>
+                <Text style={styles.errorTitle}>Model Loading</Text>
+                <Text style={styles.errorText}>
+                  The AI model is loading. This happens with free Hugging Face models.
+                </Text>
+                <Pressable style={styles.retryButton} onPress={retryGeneration}>
+                  <Feather name="refresh-cw" size={16} color="#FFFFFF" />
+                  <Text style={styles.retryButtonText}>Retry in 30 seconds</Text>
+                </Pressable>
               </View>
             )}
+
+
+            {!isLoadingImage && !currentImage && generatedImages[scenarioKey] !== 'error' && (
+              <View style={styles.noImageBox}>
+                <Feather name="image" size={48} color="#D1D5DB" />
+                <Text style={styles.noImageTitle}>No Image Generated</Text>
+                <Text style={styles.noImageText}>
+                  {customImage ? 'Custom image generation failed' : 'Click search to generate a custom scenario'}
+                </Text>
+              </View>
+            )}
+
 
             {currentImage && currentImage !== 'error' && (
               <View style={styles.imageWrapper}>
-                <Image 
+                <Image
                   source={{ uri: currentImage }}
                   style={[
                     styles.scenarioImage,
                     { opacity: isLoadingImage ? 0.3 : 1 }
                   ]}
                   resizeMode="cover"
-                  accessibilityLabel={`Future scenario for ${currentPlaceName} in +${currentYear} years.`}
+                  accessibilityLabel={customImage ? `Custom scenario: ${customPrompt}` : `Future scenario for ${currentPlaceName} in +${currentYear} years.`}
                 />
-                
-                {/* Hotspots Overlay */}
-                <View style={styles.hotspotsOverlay}>
-                  {currentScenario.bubbles.map((bubble, index) => (
-                    <HotspotBubble
-                      key={index}
-                      bubble={bubble}
-                      index={index}
-                      activeBubble={activeBubble}
-                      setActiveBubble={setActiveBubble}
-                    />
-                  ))}
-                </View>
+               
+                {/* Hotspots Overlay - Only for preset scenarios */}
+                {!customImage && currentScenario && currentScenario.bubbles && (
+                  <View style={styles.hotspotsOverlay}>
+                    {currentScenario.bubbles.map((bubble, index) => (
+                      <HotspotBubble
+                        key={index}
+                        bubble={bubble}
+                        index={index}
+                        activeBubble={activeBubble}
+                        setActiveBubble={setActiveBubble}
+                      />
+                    ))}
+                  </View>
+                )}
               </View>
             )}
           </View>
 
+
           {/* Description Area */}
           <View style={styles.descriptionArea}>
-            <View>
-              <Text style={styles.descriptionTitle}>
-                <Feather name="message-square" size={20} color="#10B981" />
-                {' '}Scientific Summary
-              </Text>
-              <Text style={styles.descriptionText}>
-                {currentScenario.description}
-              </Text>
-            </View>
+            {customImage ? (
+              <View>
+                <Text style={styles.descriptionTitle}>
+                  <Feather name="edit-3" size={20} color="#10B981" />
+                  {' '}Custom Generation
+                </Text>
+                <Text style={styles.descriptionText}>
+                  You generated an image using the prompt: "{customPrompt}"
+                </Text>
+                <Text style={styles.customInstructions}>
+                  To generate another custom image, click the search button at the top.
+                  To return to preset climate scenarios, click "Back to Presets".
+                </Text>
+              </View>
+            ) : (
+              <View>
+                <Text style={styles.descriptionTitle}>
+                  <Feather name="message-square" size={20} color="#10B981" />
+                  {' '}Scientific Summary
+                </Text>
+                <Text style={styles.descriptionText}>
+                  {currentScenario.description}
+                </Text>
+              </View>
+            )}
             <View style={styles.footerNote}>
               <Text style={styles.footerNoteText}>
-                Visualization powered by Imagen 2.0 Flash API. Scenarios are based on projected high-emission climate pathways.
+                Visualization powered by {HF_MODEL.split('/')[1]}.
+                {customImage ? ' Custom prompt generation.' : ' Scenarios are based on projected high-emission climate pathways. '}
+                  AI may make mistakes
               </Text>
             </View>
           </View>
         </View>
       </View>
 
+
       {/* Footer */}
       <View style={styles.footer}>
         <Text style={styles.footerText}>
-          Select a place and move the timeline to explore different climate impacts.
+          {customImage
+            ? 'Want to visualize another scenario? Use the search button above.'
+            : 'Select a place and move the timeline to explore different climate impacts.'}
+        </Text>
+        <Text style={styles.modelInfo}>
+          Using model: {HF_MODEL} • AI May Make Mistakes • May require retries if model is loading
         </Text>
       </View>
+
+
+      {/* Search Modal */}
+      <SearchModal
+        visible={searchModalVisible}
+        onClose={() => setSearchModalVisible(false)}
+        onGenerate={handleCustomGenerate}
+      />
     </ScrollView>
   );
 }
 
-// --- STYLESHEET (Manual Tailwind/CSS to RN Style Translation) ---
+
+// --- STYLESHEET ---
+
 
 const { width } = Dimensions.get('window');
+
 
 const styles = StyleSheet.create({
   loadingContainer: {
@@ -688,16 +977,15 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginBottom: 40,
-    fontFamily: 'Quicksand-Medium'
+    marginBottom: 32,
   },
   title: {
     fontSize: 32,
     fontWeight: '800',
     color: '#1F2937',
     textAlign: 'center',
-    fontFamily: 'Quicksand-Bold',
     marginTop: 7,
+    fontFamily:'Quicksand-Bold'
   },
   subtitle: {
     fontSize: 18,
@@ -705,20 +993,70 @@ const styles = StyleSheet.create({
     marginTop: 8,
     maxWidth: width * 0.9,
     textAlign: 'center',
-    fontFamily: 'Quicksand-Medium'
+    marginBottom: 20,
+    fontFamily:'Quicksand-Medium'
   },
+ 
+  // Search Bar
+  searchContainer: {
+    width: '100%',
+    maxWidth: 600,
+    marginTop: 16,
+  },
+  searchButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  searchButtonText: {
+    marginLeft: 12,
+    fontSize: 16,
+    color: '#6B7280',
+    flex: 1,
+    fontFamily:'Quicksand-Medium'
+  },
+
 
   // Place Selection
   placeSelectionContainer: {
     marginBottom: 32,
   },
+  placeSelectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
   placeSelectionTitle: {
     fontSize: 18,
     fontWeight: '700',
     color: '#374151',
-    marginBottom: 16,
     textAlign: 'center',
-    fontFamily: 'Quicksand-Medium'
+    fontFamily:'Quicksand-Bold'
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#10B981',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+    gap: 8,
+  },
+  backButtonText: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+    fontSize: 14,
   },
   placeCardWrapper: {
     flexDirection: 'row',
@@ -760,8 +1098,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
     lineHeight: 18,
-    fontFamily: 'Quicksand-Medium'
   },
+
 
   // Main Content Area
   mainContentArea: {
@@ -776,6 +1114,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#F3F4F6',
   },
+
 
   // Timeline
   timelineArea: {
@@ -833,18 +1172,16 @@ const styles = StyleSheet.create({
   timelineTextBase: {
     fontSize: 12,
     marginTop: 12,
-    fontFamily: 'Quicksand-Medium'
   },
   timelineTextSelected: {
     fontWeight: '800',
     color: '#059669',
-    fontFamily: 'Quicksand-Medium'
   },
   timelineTextNormal: {
     color: '#4B5563',
     fontWeight: '500',
-    fontFamily: 'Quicksand-Medium'
   },
+
 
   // Scenario Header
   scenarioHeader: {
@@ -859,7 +1196,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 4,
     textAlign: 'center',
-    fontFamily: 'Quicksand-Medium'
+    fontFamily:'Quicksand-Bold'
   },
   scenarioYearText: {
     color: '#EF4444',
@@ -871,16 +1208,28 @@ const styles = StyleSheet.create({
     color: '#4B5563',
     fontStyle: 'italic',
     textAlign: 'center',
-    fontFamily: 'Quicksand-Medium'
+    fontFamily:'Quicksand-Medium'
   },
+  customPromptText: {
+    fontSize: 16,
+    color: '#4B5563',
+    textAlign: 'center',
+    fontStyle: 'italic',
+    backgroundColor: '#F3F4F6',
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 8,
+    width: '100%',
+  },
+
 
   // Image Area
   imageDescriptionLayout: {
-    flexDirection: Dimensions.get('window').width > 768 ? 'row' : 'column',
+    flexDirection: width > 768 ? 'row' : 'column',
     gap: 16,
   },
   imageVisualizationArea: {
-    flex: Dimensions.get('window').width > 768 ? 2 : 1, // 2/3 width on large screens
+    flex: width > 768 ? 2 : 1,
     backgroundColor: '#F3F4F6',
     borderRadius: 12,
     overflow: 'hidden',
@@ -890,7 +1239,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 4,
     aspectRatio: 16 / 9,
-    marginBottom: Dimensions.get('window').width > 768 ? 0 : 24,
+    marginBottom: width > 768 ? 0 : 24,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
@@ -916,14 +1265,12 @@ const styles = StyleSheet.create({
     color: '#374151',
     fontWeight: '600',
     textAlign: 'center',
-    fontFamily: 'Quicksand-Medium'
   },
   overlaySmallText: {
     fontSize: 12,
     color: '#6B7280',
     fontStyle: 'bold',
     textAlign: 'center',
-    fontFamily: 'Quicksand-Medium'
   },
   imageErrorBox: {
     padding: 24,
@@ -939,14 +1286,45 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#B91C1C',
     marginTop: 12,
-    fontFamily: 'Quicksand-Medium'
   },
   errorText: {
     fontSize: 14,
     color: '#B91C1C',
     textAlign: 'center',
-    fontFamily: 'Quicksand-Medium'
+    marginBottom: 16,
   },
+  retryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#10B981',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+    gap: 8,
+  },
+  retryButtonText: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  noImageBox: {
+    padding: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  noImageTitle: {
+    fontWeight: '600',
+    color: '#6B7280',
+    marginTop: 16,
+    fontSize: 18,
+  },
+  noImageText: {
+    fontSize: 14,
+    color: '#9CA3AF',
+    textAlign: 'center',
+    marginTop: 8,
+  },
+
 
   // Hotspots
   hotspotsOverlay: {
@@ -1009,17 +1387,16 @@ const styles = StyleSheet.create({
     color: '#FCA5A5',
     flexDirection: 'row',
     alignItems: 'center',
-    fontFamily: 'Quicksand-Medium'
   },
   tooltipText: {
     fontSize: 14,
     color: '#D1D5DB',
-    fontFamily: 'Quicksand-Medium'
   },
+
 
   // Description Area
   descriptionArea: {
-    flex: Dimensions.get('window').width > 768 ? 1 : 1, // 1/3 width on large screens
+    flex: width > 768 ? 1 : 1,
     padding: 16,
     backgroundColor: '#F9FAFB',
     borderRadius: 12,
@@ -1042,13 +1419,23 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    fontFamily: 'Quicksand-Medium'
+    fontFamily:'Quicksand-Bold'
   },
   descriptionText: {
     color: '#374151',
     lineHeight: 24,
     fontSize: 16,
-    fontFamily: 'Quicksand-Medium'
+    fontFamily:'Quicksand-Medium'
+  },
+  customInstructions: {
+    color: '#6B7280',
+    lineHeight: 20,
+    fontSize: 14,
+    fontStyle: 'italic',
+    marginTop: 12,
+    padding: 12,
+    backgroundColor: '#F3F4F6',
+    borderRadius: 8,
   },
   footerNote: {
     marginTop: 16,
@@ -1060,8 +1447,9 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: '#6B7280',
     fontStyle: 'bold',
-    fontFamily: 'Quicksand-Medium'
+    fontFamily:'Quicksand-Medium'
   },
+
 
   // Footer
   footer: {
@@ -1072,6 +1460,130 @@ const styles = StyleSheet.create({
   footerText: {
     fontSize: 12,
     color: '#6B7280',
-    fontFamily: 'Quicksand-Medium'
-  }
+    textAlign: 'center',
+    fontFamily:'Quicksand-Medium'
+  },
+  modelInfo: {
+    fontSize: 10,
+    color: '#9CA3AF',
+    textAlign: 'center',
+    marginTop: 8,
+    fontStyle: 'italic',
+    fontFamily:'Quicksand-Medium'
+  },
+
+
+  // Search Modal
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 24,
+    width: '100%',
+    maxWidth: 500,
+    maxHeight: '80%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#1F2937',
+  },
+  closeButton: {
+    padding: 4,
+  },
+  modalSubtitle: {
+    fontSize: 16,
+    color: '#4B5563',
+    marginBottom: 20,
+  },
+  searchInput: {
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    padding: 16,
+    fontSize: 16,
+    backgroundColor: '#F9FAFB',
+    minHeight: 100,
+    marginBottom: 20,
+  },
+  recentSearches: {
+    marginBottom: 20,
+  },
+  recentTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: 8,
+  },
+  recentList: {
+    gap: 8,
+  },
+  recentItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F3F4F6',
+    padding: 12,
+    borderRadius: 8,
+    gap: 8,
+  },
+  recentText: {
+    color: '#4B5563',
+    fontSize: 14,
+    flex: 1,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  cancelButton: {
+    flex: 1,
+    padding: 16,
+    alignItems: 'center',
+    backgroundColor: '#F3F4F6',
+    borderRadius: 12,
+  },
+  cancelButtonText: {
+    color: '#374151',
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  generateButton: {
+    flex: 2,
+    padding: 16,
+    alignItems: 'center',
+    backgroundColor: '#10B981',
+    borderRadius: 12,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  generateButtonDisabled: {
+    opacity: 0.7,
+  },
+  generateButtonText: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  modalNote: {
+    fontSize: 12,
+    color: '#6B7280',
+    textAlign: 'center',
+    marginTop: 16,
+    fontStyle: 'italic',
+  },
 });
+

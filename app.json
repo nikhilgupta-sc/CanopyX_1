@@ -1,11 +1,12 @@
 {
   "expo": {
-    "name": "canopyx",
-    "slug": "snack-86772f5d-93e6-4d75-b1e3-8fd07eb434ca",
+    "name": "CanopyX",
+    "slug": "canopyx",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/CanopyX.png",
     "userInterfaceStyle": "light",
+    "scheme": "canopyx",
     "newArchEnabled": false,
     "splash": {
       "image": "./assets/splash-icon.png",
@@ -14,7 +15,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.nikeeel.snack86772f5d93e64d75b1e38fd07eb434ca",
+      "bundleIdentifier": "com.nikeeel.canopyx",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -25,15 +26,39 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.nikeeel.snack86772f5d93e64d75b1e38fd07eb434ca"
+      "package": "com.nikeeel.canopyx",
+      "googleServicesFile": "./google-services.json",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "canopyx"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "extra": {
       "eas": {
-        "projectId": "65374299-5bde-4319-8aa4-a728b059c294"
+        "projectId": "93d97c83-e898-41d8-b48e-615614e5d93d"
       }
-    }
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-auth-session",
+        {
+          "redirectTo": "canopyx://oauth2redirect"
+        }
+      ],
+      "@react-native-firebase/app"
+    ],
+    "owner": "nikeeel"
   }
 }
