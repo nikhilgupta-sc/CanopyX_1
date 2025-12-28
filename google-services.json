@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "818108344816",
+    "project_id": "canopyx-e5d0c",
+    "storage_bucket": "canopyx-e5d0c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:818108344816:android:71a7bb642f79796e4ad535",
+        "android_client_info": {
+          "package_name": "com.nikeeel.canopyx"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "818108344816-jh1k9rukdn2j24n079fkq3jhjsphgf5q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDNm2Du9UR0fdbWh9So-ENdUtS54IfiPjM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "818108344816-jh1k9rukdn2j24n079fkq3jhjsphgf5q.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
