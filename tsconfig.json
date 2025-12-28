@@ -5,6 +5,9 @@
     "baseUrl": ".",
     "paths": {
       "~/*": ["*"]
-    }
+    },
+    "moduleResolution": "bundler",
+    "module": "ESNext",
+    "noEmit": true
   }
 }

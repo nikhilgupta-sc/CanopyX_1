@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -10,12 +10,15 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  Image
 } from 'react-native';
-import { loadData, saveData } from './storage';
-import { useAuth } from './contexts/AuthContext'; // Use Firebase Auth context
+import * as WebBrowser from 'expo-web-browser';
+import { saveData } from './storage';
+import { useAuth } from './contexts/AuthContext';
 import GoogleLoginButton from './components/GoogleLoginButton';
 import AppleLoginButton from './components/AppleLoginButton';
+
+// Essential for closing the browser tab after social login
+WebBrowser.maybeCompleteAuthSession();
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
@@ -24,7 +27,6 @@ export default function LoginScreen({ navigation }) {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [appleLoading, setAppleLoading] = useState(false);
   
-  // Get the auth methods from Firebase Auth context
   const { signInWithGoogle, signInWithApple, signInWithEmail } = useAuth();
 
   const handleEmailLogin = async () => {
@@ -32,21 +34,16 @@ export default function LoginScreen({ navigation }) {
       Alert.alert('Error', 'Please fill in all fields');
       return;
     }
-  const handleLogin = async () => {
-  await signIn(email, password);
-  await syncCloudToLocal(); // Pull their cloud data down
-};
+
     setIsLoading(true);
-    
     try {
-      // Sign in with Firebase email authentication
+      // 1. Sign in with Firebase
       await signInWithEmail(email, password);
       
-      // Also save to local storage for demo purposes
+      // 2. Save session data locally
       const userData = {
         name: email.split('@')[0] || 'User',
         email: email.trim().toLowerCase(),
-        password: password,
         isLoggedIn: true,
         loginDate: new Date().toISOString(),
       };
@@ -54,7 +51,7 @@ export default function LoginScreen({ navigation }) {
       
     } catch (error) {
       console.error('Login error:', error);
-      Alert.alert('Login Failed', error.message || 'Unable to sign in. Please try again.');
+      Alert.alert('Login Failed', error.message || 'Unable to sign in.');
     } finally {
       setIsLoading(false);
     }
@@ -63,10 +60,15 @@ export default function LoginScreen({ navigation }) {
   const handleGoogleLogin = async () => {
     setGoogleLoading(true);
     try {
+      // This will trigger the AuthContext method
+      // Make sure useProxy: true is set inside that method if testing on Expo Go
       await signInWithGoogle();
     } catch (error) {
       console.error('Google login failed:', error);
-      Alert.alert('Login Failed', 'Unable to sign in with Google. Please try again.');
+      // Only alert if it's not a user cancellation
+      if (!error.message?.includes('cancel')) {
+        Alert.alert('Login Failed', 'Unable to sign in with Google.');
+      }
     } finally {
       setGoogleLoading(false);
     }
@@ -78,7 +80,7 @@ export default function LoginScreen({ navigation }) {
       await signInWithApple();
     } catch (error) {
       console.error('Apple login failed:', error);
-      Alert.alert('Login Failed', 'Unable to sign in with Apple. Please try again.');
+      Alert.alert('Login Failed', 'Unable to sign in with Apple.');
     } finally {
       setAppleLoading(false);
     }
@@ -92,13 +94,10 @@ export default function LoginScreen({ navigation }) {
       >
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.content}>
-            {/* Add your logo */}
-          
             
             <Text style={styles.title}>Welcome Back!</Text>
             <Text style={styles.subtitle}>Sign in to continue your climate journey</Text>
             
-            {/* Social Login Buttons */}
             <View style={styles.socialButtonsContainer}>
               <GoogleLoginButton 
                 loading={googleLoading}
@@ -117,7 +116,6 @@ export default function LoginScreen({ navigation }) {
               <View style={styles.dividerLine} />
             </View>
 
-            {/* Email Login Form */}
             <View style={styles.form}>
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Email</Text>
@@ -179,35 +177,27 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   content: {
-    flex: 1,
-    justifyContent: 'center',
     paddingHorizontal: 24,
     paddingVertical: 32,
   },
-  logo: {
-    width: 100,
-    height: 100,
-    alignSelf: 'center',
-    marginBottom: 20,
-  },
   title: {
     fontSize: 32,
-    fontFamily: 'Quicksand-Bold',
     color: '#1B4332',
     textAlign: 'center',
     marginBottom: 8,
+    fontFamily: 'Quicksand-Bold'
   },
   subtitle: {
     fontSize: 16,
-    fontFamily: 'Quicksand-Regular',
     color: '#6B7280',
     textAlign: 'center',
     marginBottom: 32,
+    fontFamily:'Quicksand-Medium'
   },
   socialButtonsContainer: {
     width: '100%',
+    gap: 12,
     marginBottom: 24,
-    fontFamily: 'Quicksand-Medium'
   },
   divider: {
     flexDirection: 'row',
@@ -222,7 +212,6 @@ const styles = StyleSheet.create({
   dividerText: {
     marginHorizontal: 16,
     fontSize: 14,
-    fontFamily: 'Quicksand-Medium',
     color: '#6B7280',
   },
   form: {
@@ -233,9 +222,10 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    fontFamily: 'Quicksand-SemiBold',
+    fontWeight: '600',
     color: '#1B4332',
     marginBottom: 8,
+    fontFamily:'Quicksand-Bold'
   },
   input: {
     borderWidth: 1,
@@ -243,9 +233,9 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     fontSize: 16,
-    fontFamily: 'Quicksand-Regular',
     backgroundColor: '#FFFFFF',
     minHeight: 52,
+    fontFamily: 'Quicksand-Medium'
   },
   button: {
     backgroundColor: '#22C55E',
@@ -262,7 +252,8 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#FFFFFF',
     fontSize: 16,
-    fontFamily: 'Quicksand-SemiBold',
+    fontWeight: '600',
+    fontFamily:'Quicksand-Bold'
   },
   linkButton: {
     marginTop: 24,
@@ -270,11 +261,12 @@ const styles = StyleSheet.create({
   },
   linkText: {
     fontSize: 14,
-    fontFamily: 'Quicksand-Regular',
     color: '#6B7280',
+    fontFamily:'Quicksand-Medium'
   },
   linkTextBold: {
-    fontFamily: 'Quicksand-SemiBold',
+    fontWeight: '600',
     color: '#22C55E',
+    fontFamily:'Quicksand-Medium'
   },
 });

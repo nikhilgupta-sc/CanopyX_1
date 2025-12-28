@@ -30,7 +30,7 @@ const PLACES = [
 const YEARS = [5, 10, 25, 50, 100];
 
 
-const HF_API_TOKEN = "Token_here";
+const HF_API_TOKEN = "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";
 
 
 
